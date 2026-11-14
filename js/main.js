@@ -257,8 +257,12 @@ function configurarReliquiasRitual() {
         let inicioY = 0;
         let seMovio = false;
 
+        // Bloquea el arrastre fantasma nativo del navegador sobre enlaces <a>
+        reliquia.addEventListener('dragstart', (e) => e.preventDefault());
+
+        // Evita que al soltar o tocar sin invocar se dispare el link directamente
         reliquia.addEventListener('click', (e) => {
-            if (seMovio) e.preventDefault();
+            e.preventDefault();
         });
 
         reliquia.addEventListener('pointerdown', (e) => {
@@ -302,7 +306,7 @@ function configurarReliquiasRitual() {
 
             const { distancia, centroAltarX, centroAltarY } = calcularDistanciaAltar(reliquia);
 
-            if (distancia < CONFIG.RADIO_ALTAR) {
+            if (seMovio && distancia < CONFIG.RADIO_ALTAR) {
                 for (const p of particulas) {
                     const ang = atan2(p.y - centroAltarY, p.x - centroAltarX);
                     const impulso = random(4, 11);
