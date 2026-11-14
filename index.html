@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio de Diseño Multimedia | Kevin D.D</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Marcellus&display=swap">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="loader-overlay" class="loader-velo">
+        <p class="loader-indication">Deslizá para entrar</p>
+    </div>
+
+    <header class="cabecera-fija">
+        <div class="cabecera-interior">
+            <div class="logo-marca">
+                <h1>Kevin D.D</h1>
+            </div>
+
+            <input type="checkbox" id="menu-toggle" class="menu-toggle-input">
+            <label for="menu-toggle" class="menu-hamburguesa-btn" aria-label="Abrir menú">
+                <span class="linea-hamburguesa"></span>
+                <span class="linea-hamburguesa"></span>
+                <span class="linea-hamburguesa"></span>
+            </label>
+
+            <nav class="menu-navegacion" aria-label="Principal">
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#proyecto-destacado">Destacado</a></li>
+                    <li><a href="#resto-proyectos">Proyectos</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="portada-snap">
+
+        <!-- SECCIÓN 1: SOBRE MÍ -->
+        <section id="inicio" class="seccion-pantalla">
+            <div class="contenedor-interno-seccion">
+                <h2>Sobre mí</h2>
+                <div class="bloque-perfil">
+                    <div id="contenedor-particulas-perfil"></div>
+                    <p>Estudiante de Diseño Multimedia en la Universidad Nacional de Moreno. Me enfoco en crear experiencias inmersivas y arte espacial utilizando herramientas como TouchDesigner, After Effects, Arduino y Blender.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: PROYECTO DESTACADO -->
+        <section id="proyecto-destacado" class="seccion-pantalla">
+            <div class="contenedor-interno-seccion">
+                <h2>Proyectos</h2>
+                <article class="tarjeta-proyecto-hero">
+                    <span class="etiqueta-destacada">Recomendado</span>
+                    <div class="hero-grid">
+                        <div class="hero-imagen-contenedor">
+                            <img src="img/nostra-nonna.webp"
+                                 alt="Secuencia ceremonial y escénica en el rediseño del teatro La Nonna"
+                                 class="img-tarjeta-hero"
+                                 width="600"
+                                 height="338"
+                                 loading="lazy">
+                        </div>
+                        <div class="hero-info">
+                            <h3>Nostra Nonna</h3>
+                            <p class="hero-sub">Rediseño escénico e identidad espacial</p>
+                            <p>Rediseño del teatro La Nonna, llevado a ser un templo ocultista que transmite las tradiciones mediante el histrionismo.</p>
+                            <a href="#modal-nonna" class="boton-proyecto">Más información</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: OTROS PROYECTOS -->
+        <section id="resto-proyectos" class="seccion-pantalla">
+            <div class="contenedor-interno-seccion">
+                <h2>Otros Proyectos</h2>
+                <div class="galeria-proyectos-compartida">
+                    <article class="tarjeta-proyecto">
+                        <img src="img/colmena-digital.webp"
+                             alt="Simulación interactiva de enjambre de partículas generadas en p5.js"
+                             class="img-tarjeta"
+                             width="600"
+                             height="338"
+                             loading="lazy">
+                        <h3>Colmena Digital</h3>
+                        <p>Simulación de enjambre de partículas en p5.js vinculada a una base de datos dinámica para visualización de proyectos.</p>
+                        <a href="#modal-colmena" class="boton-proyecto">Más información</a>
+                    </article>
+
+                    <article class="tarjeta-proyecto">
+                        <img src="img/memoria-960.webp"
+                             srcset="img/memoria-480.webp 480w, img/memoria-960.webp 960w"
+                             sizes="(min-width: 40rem) 24rem, 100vw"
+                             alt="Instalación interactiva con rostros proyectados sobre pañuelos"
+                             class="img-tarjeta"
+                             width="960"
+                             height="540"
+                             loading="lazy">
+                        <h3>Memoria</h3>
+                        <p>Instalación interactiva en conmemoración a los 50 años de Memoria, Verdad y Justicia.</p>
+                        <a href="#modal-memoria" class="boton-proyecto">Más información</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: CONTACTO -->
+        <section id="contacto" class="seccion-pantalla seccion-contacto">
+            <div class="contenedor-interno-seccion">
+                <h2>Contacto</h2>
+                <div class="escena-ritual">
+                    <div class="pedestal-reliquia">
+                        <a href="mailto:tuemail@ejemplo.com" class="reliquia-arrastrable" data-accion="contacto">
+                            <div class="grupo-iconos">
+                                <span class="reliquia-simbolo">🎴</span>
+                                <span class="reliquia-simbolo">🧉</span>
+                            </div>
+                            <span class="reliquia-titulo">Hablame</span>
+                            <span class="reliquia-sub">Mazo &amp; Mate · Mail</span>
+                        </a>
+                    </div>
+
+                    <div id="altar-invocacion" class="altar-nucleo" aria-hidden="true">
+                        <span class="altar-texto">Soltar acá</span>
+                    </div>
+
+                    <div class="pedestal-reliquia">
+                        <a href="https://www.behance.net/" target="_blank" rel="noopener noreferrer" class="reliquia-arrastrable" data-accion="behance">
+                            <div class="grupo-iconos">
+                                <span class="reliquia-simbolo">☕</span>
+                                <span class="reliquia-simbolo">✏️</span>
+                            </div>
+                            <span class="reliquia-titulo">Behance</span>
+                            <span class="reliquia-sub">Café &amp; Lápices · Archivo</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALES -->
+    <div id="modal-nonna" class="modal-contenedor">
+        <a href="#proyecto-destacado" class="modal-fondo-cerrar" aria-label="Cerrar ventana"></a>
+        <div class="modal-contenido">
+            <a href="#proyecto-destacado" class="modal-cerrar" title="Cerrar">&times;</a>
+            <h3>Nostra Nonna</h3>
+            <p class="modal-subtitulo">Rediseño escénico e identidad espacial</p>
+            <p>Propuesta conceptual que transforma la arquitectura teatral convencional en un templo ceremonial. Mediante composiciones visuales oscuras y secuencias ritmadas, se explora el teatro como acto ritual e histriónico.</p>
+            <h4>Herramientas utilizadas:</h4>
+            <ul class="lista-herramientas">
+                <li>Adobe After Effects (Motion Graphics y Tracking)</li>
+                <li>Photoshop (Composición de cartelería visual)</li>
+                <li>HTML / CSS (Maquetación web interactiva)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="modal-colmena" class="modal-contenedor">
+        <a href="#resto-proyectos" class="modal-fondo-cerrar" aria-label="Cerrar ventana"></a>
+        <div class="modal-contenido">
+            <a href="#resto-proyectos" class="modal-cerrar" title="Cerrar">&times;</a>
+            <h3>Colmena Digital</h3>
+            <p class="modal-subtitulo">Visualización de datos y simulación gráfica</p>
+            <p>Sistema generativo en tiempo real que simula el comportamiento orgánico de un enjambre. Las partículas reaccionan dinámicamente según entradas de datos y eventos de navegación del usuario.</p>
+            <h4>Herramientas utilizadas:</h4>
+            <ul class="lista-herramientas">
+                <li>p5.js (Lógica matemática y render en Canvas)</li>
+                <li>XAMPP y SQL (Base de datos)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="modal-memoria" class="modal-contenedor">
+        <a href="#resto-proyectos" class="modal-fondo-cerrar" aria-label="Cerrar ventana"></a>
+        <div class="modal-contenido">
+            <a href="#resto-proyectos" class="modal-cerrar" title="Cerrar">&times;</a>
+            <h3>Memoria</h3>
+            <p class="modal-subtitulo">Instalación interactiva y video mapping</p>
+            <p>Intervención audiovisual a 50 años de los acontecimientos de Memoria, Verdad y Justicia. La obra proyecta rostros y texturas sobre pañuelos cinéticos suspendidos en el espacio en tiempo real.</p>
+            <h4>Herramientas utilizadas:</h4>
+            <ul class="lista-herramientas">
+                <li>TouchDesigner (Generación procedural de partículas y mapeo)</li>
+                <li>ESP32 / Sensores físicos</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
