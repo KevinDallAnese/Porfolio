@@ -443,6 +443,26 @@ a:focus {
     margin-bottom: var(--espacio-3);
 }
 
+.hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espacio-2);
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--espacio-3) 0;
+}
+
+.hero-tags li {
+    font-family: var(--fuente-titulos);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-texto-tenue);
+    border: 1px solid var(--color-borde);
+    padding: 0.2rem 0.6rem;
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
 .galeria-proyectos-compartida {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -471,7 +491,7 @@ a:focus {
 
 .etiqueta-destacada {
     position: absolute;
-    top: var(--espacio-3);
+    top: var(--espacio-4);
     right: var(--espacio-4);
     background-color: rgba(0, 0, 0, 0.85);
     border: 1px solid var(--color-marca);
@@ -817,9 +837,13 @@ a:focus {
         transform: translateY(-9px) rotate(-45deg);
     }
 
-    /* Pantallas ancladas arriba en móvil para que todos los H2 queden fijos a la misma altura */
+    /* Pantallas contenidas estrictamente dentro de su viewport sin desbordes entre secciones */
     .seccion-pantalla {
-        padding: 5.2rem var(--espacio-3) var(--espacio-3);
+        height: 100dvh;
+        min-height: 100dvh;
+        max-height: 100dvh;
+        overflow: hidden;
+        padding: 4.8rem var(--espacio-3) var(--espacio-2);
         justify-content: flex-start;
     }
 
@@ -828,6 +852,7 @@ a:focus {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
+        min-height: 0;
     }
 
     /* Perfil centrado en el área disponible bajo el H2 */
@@ -853,29 +878,89 @@ a:focus {
         line-height: 1.6;
     }
 
-    /* Tarjetas de proyectos */
+    /* Proyecto destacado (Hero) */
+    .tarjeta-proyecto-hero {
+        padding: var(--espacio-3);
+        margin-block: auto;
+    }
+
     .hero-grid {
         grid-template-columns: 1fr;
         gap: var(--espacio-2);
     }
 
-    .galeria-proyectos-compartida {
-        display: flex;
-        flex-direction: column;
-        gap: var(--espacio-2);
+    .img-tarjeta-hero {
+        aspect-ratio: 4 / 3;
     }
 
-    .tarjeta-proyecto,
-    .tarjeta-proyecto-hero {
-        padding: var(--espacio-3);
+    .etiqueta-destacada {
+        position: static;
+        display: inline-block;
+        margin-bottom: var(--espacio-2);
+        font-size: 0.65rem;
     }
 
-    .img-tarjeta {
+    .hero-sub {
         margin-bottom: var(--espacio-2);
     }
 
-    .boton-proyecto {
+    .hero-tags {
+        margin-bottom: var(--espacio-3);
+        gap: var(--espacio-1);
+    }
+
+    .hero-tags li {
+        font-size: 0.62rem;
+    }
+
+    .tarjeta-proyecto-hero .boton-proyecto {
         padding: 0.4rem var(--espacio-3);
+        font-size: 0.75rem;
+    }
+
+/* Otros Proyectos: carrusel horizontal táctil escalable  */
+    .galeria-proyectos-compartida {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: var(--espacio-3);
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        margin-block: auto;
+        padding-bottom: var(--espacio-1);
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .galeria-proyectos-compartida::-webkit-scrollbar {
+        display: none;
+    }
+
+    .galeria-proyectos-compartida .tarjeta-proyecto {
+        flex: 0 0 84%;
+        scroll-snap-align: start;
+        padding: var(--espacio-3);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .galeria-proyectos-compartida .img-tarjeta {
+        aspect-ratio: 16 / 9;
+        margin-bottom: var(--espacio-2);
+    }
+
+    .galeria-proyectos-compartida p {
+        font-size: 0.82rem;
+        line-height: 1.55;
+        margin-bottom: var(--espacio-3);
+    }
+
+    .galeria-proyectos-compartida .boton-proyecto {
+        margin-top: auto;
+        padding: 0.45rem var(--espacio-3);
         font-size: 0.75rem;
     }
 
