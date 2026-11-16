@@ -239,7 +239,19 @@ function setup() {
     configurarCierreNavbarMovil();
     configurarProfundidadCarrusel();
     configurarCambioRetrato();
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+            const nuevosPuntosTexto = muestrearPuntosTexto(esMobile, totalParticulas);
+            for (let i = 0; i < particulas.length; i++) {
+                const pt = nuevosPuntosTexto[i % nuevosPuntosTexto.length];
+                particulas[i].textoX = pt.x;
+                particulas[i].textoY = pt.y;
+            }
+        });
+    }
 }
+
 
 /* ==========================================================================
    3. RITUAL DE ENTRADA (LLAMAS DE BRASAS Y MATERIALIZACIÓN DEL SELLO)
