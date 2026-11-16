@@ -187,7 +187,7 @@ function cargarPuntosRetratos(anchoImg, altoImg) {
 }
 
 function setup() {
-    pixelDensity(1);
+    pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
 
     canvasGlobal = createCanvas(windowWidth, windowHeight);
     canvasGlobal.id('canvas-global-particulas');
