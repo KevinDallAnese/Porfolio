@@ -15,7 +15,9 @@
 <body>
 
     <div id="loader-overlay" class="loader-velo">
-        <p class="loader-indication">Deslizá para entrar</p>
+        <div class="loader-pie">
+            <p class="loader-indication">Uní las llamas para completar el sello</p>
+        </div>
     </div>
 
     <header class="cabecera-fija">
@@ -116,7 +118,19 @@
                         <p>Instalación interactiva en conmemoración a los 50 años de Memoria, Verdad y Justicia.</p>
                         <a href="#modal-memoria" class="boton-proyecto">Más información</a>
                     </article>
+                    <article class="tarjeta-proyecto">
+                        <img src="img/armonia.webp"
+                             alt="Visualización 3D interactiva de la instalación museográfica La armonía del saber"
+                             class="img-tarjeta"
+                             width="600"
+                             height="338"
+                             loading="lazy">
+                        <h3>La armonía del saber</h3>
+                        <p>Instalación museográfica e inmersiva en caja oscura de 12×4 m con visualización 3D en tiempo real inspirada en el Ginnungagap.</p>
+                        <a href="#modal-armonia" class="boton-proyecto">Más información</a>
+                    </article>
                 </div>
+                <div class="indicador-carrusel" aria-label="Navegación de proyectos"></div>
             </div>
         </section>
 
@@ -127,9 +141,19 @@
                 <div class="escena-ritual">
                     <div class="pedestal-reliquia">
                         <a href="mailto:tuemail@ejemplo.com" class="reliquia-arrastrable" data-accion="contacto">
-                            <div class="grupo-iconos">
-                                <span class="reliquia-simbolo">🎴</span>
-                                <span class="reliquia-simbolo">🧉</span>
+                            <div class="grupo-iconos" aria-hidden="true">
+                                <svg class="reliquia-svg" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="6" y="7" width="16" height="23" rx="2" transform="rotate(-10 14 18)" opacity="0.45"/>
+                                    <rect x="12" y="6" width="16" height="23" rx="2" fill="#070505"/>
+                                    <path d="M20 12.5L21.3 16.2L25 17.5L21.3 18.8L20 22.5L18.7 18.8L15 17.5L18.7 16.2Z"/>
+                                </svg>
+                                <svg class="reliquia-svg" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 14L28 5"/>
+                                    <circle cx="28.3" cy="4.6" r="1.1" fill="currentColor"/>
+                                    <path d="M11 14H25C25 14 27 18.5 25.5 24C24.2 28.5 21 30 18 30C15 30 11.8 28.5 10.5 24C9 18.5 11 14 11 14Z" fill="#070505"/>
+                                    <path d="M10.5 17.5H25.5"/>
+                                    <path d="M14 23.5L18 21.5L22 23.5"/>
+                                </svg>
                             </div>
                             <span class="reliquia-titulo">Hablame</span>
                             <span class="reliquia-sub">Mazo &amp; Mate · Mail</span>
@@ -142,9 +166,20 @@
 
                     <div class="pedestal-reliquia">
                         <a href="https://www.behance.net/" target="_blank" rel="noopener noreferrer" class="reliquia-arrastrable" data-accion="behance">
-                            <div class="grupo-iconos">
-                                <span class="reliquia-simbolo">☕</span>
-                                <span class="reliquia-simbolo">✏️</span>
+                            <div class="grupo-iconos" aria-hidden="true">
+                                <svg class="reliquia-svg" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M13 9C13 7 14.5 6.5 14.5 5"/>
+                                    <path d="M18 9C18 7 19.5 6.5 19.5 5"/>
+                                    <path d="M8 13H23V21C23 25.5 19.8 28 15.5 28C11.2 28 8 25.5 8 21V13Z" fill="#070505"/>
+                                    <path d="M23 15.5H26C27.8 15.5 29 16.8 29 18.5C29 20.2 27.8 21.5 26 21.5H23"/>
+                                    <path d="M6 30.5H25"/>
+                                </svg>
+                                <svg class="reliquia-svg" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M24.5 6.5L29.5 11.5L13 28L7 29L8 23L24.5 6.5Z" fill="#070505"/>
+                                    <path d="M21.5 9.5L26.5 14.5"/>
+                                    <path d="M8.5 23.5L12.5 27.5"/>
+                                    <path d="M10 10L14 14M22 22L26 26" opacity="0.5"/>
+                                </svg>
                             </div>
                             <span class="reliquia-titulo">Behance</span>
                             <span class="reliquia-sub">Café &amp; Lápices · Archivo</span>
@@ -199,6 +234,21 @@
             <ul class="lista-herramientas">
                 <li>TouchDesigner (Generación procedural de partículas y mapeo)</li>
                 <li>ESP32 / Sensores físicos</li>
+            </ul>
+        </div>
+    </div>
+    <div id="modal-armonia" class="modal-contenedor">
+        <a href="#resto-proyectos" class="modal-fondo-cerrar" aria-label="Cerrar ventana"></a>
+        <div class="modal-contenido">
+            <a href="#resto-proyectos" class="modal-cerrar" title="Cerrar">&times;</a>
+            <h3>La armonía del saber</h3>
+            <p class="modal-subtitulo">Instalación museográfica e inmersiva (UNM)</p>
+            <p>Experiencia interactiva web basada en una caja oscura arquitectónica de 12×4 m. El proyecto articula obras de arte cinético e inmaterial (Sorrentino, Nakaya, Le Parc, Turrell) bajo un marco conceptual inspirado en el Ginnungagap. Incluye visualización 3D en tiempo real, modelado optimizado y renderizado condicional por visibilidad para garantizar fluidez en hardware limitado.</p>
+            <h4>Herramientas utilizadas:</h4>
+            <ul class="lista-herramientas">
+                <li>Three.js (Gráficos 3D, OrbitControls, cargador Draco y mallas instanciadas InstancedMesh)</li>
+                <li>JavaScript &amp; HTML5/CSS3 (Lógica de escena, diseño modular y IntersectionObserver para carga perezosa)</li>
+                <li>Blender (Modelado y optimización de geometría y assets)</li>
             </ul>
         </div>
     </div>
