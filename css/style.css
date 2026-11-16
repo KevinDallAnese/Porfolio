@@ -376,9 +376,10 @@ a:focus {
 
 #contenedor-particulas-perfil {
     float: left;
-    width: 340px;
-    height: 255px;
+    width: 260px;
+    height: 350px;
     margin: 0 var(--espacio-5) var(--espacio-2) 0;
+    cursor: pointer;
 }
 
 .bloque-perfil p {
@@ -888,11 +889,11 @@ a:focus {
     }
 
     #contenedor-particulas-perfil {
-    float: left;
-    width: 260px;
-    height: 350px;
-    margin: 0 var(--espacio-5) var(--espacio-2) 0;
-    cursor: pointer;
+        width: 150px;
+        height: 200px;
+        float: none;
+        margin: 0 auto var(--espacio-3) auto;
+        cursor: pointer;
     }
 
     .bloque-perfil p {
