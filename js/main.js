@@ -39,16 +39,16 @@ let indiceRetratoActual = 0;
 
 function crearSpriteMarca() {
     const { r, g, b } = CONFIG.COLOR_MARCA;
-    const pg = createGraphics(24, 24);
+    const pg = createGraphics(48, 48);
     const ctx = pg.drawingContext;
-    const grad = ctx.createRadialGradient(12, 12, 0, 12, 12, 12);
+    const grad = ctx.createRadialGradient(24, 24, 0, 24, 24, 24);
 
     grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.95)`);
     grad.addColorStop(0.32, `rgba(${r}, ${g}, ${b}, 0.45)`);
     grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 24, 24);
+    ctx.fillRect(0, 0, 48, 48);
     spriteMarca = pg;
 }
 
@@ -641,6 +641,52 @@ function calcularDistanciaAltar(reliquia) {
     };
 }
 
+function ejecutarAccionReliquia(reliquia, centroAltarX, centroAltarY) {
+    for (const p of particulas) {
+        const ang = atan2(p.y - centroAltarY, p.x - centroAltarX);
+        const impulso = random(4, 11);
+        p.vx += cos(ang) * impulso;
+        p.vy += sin(ang) * impulso;
+    }
+
+    const urlDestino = reliquia.getAttribute('href');
+    const esNuevaPestana = reliquia.getAttribute('target') === '_blank';
+    const esMailto = urlDestino && urlDestino.startsWith('mailto:');
+
+    if (esMailto) {
+        const correoLimpio = urlDestino.replace('mailto:', '').split('?')[0];
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(correoLimpio).catch(() => {});
+        }
+
+        const textoAltar = altarInvocacion.querySelector('.altar-texto');
+        if (textoAltar) {
+            const textoOriginal = textoAltar.textContent;
+            textoAltar.textContent = 'CORREO COPIADO';
+            setTimeout(() => {
+                textoAltar.textContent = textoOriginal;
+            }, 2500);
+        }
+
+        const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
+        if (esMobile) {
+            window.location.href = urlDestino;
+        } else {
+            const asunto = encodeURIComponent('Consulta desde Portfolio');
+            const urlGmailWeb = `https://mail.google.com/mail/?view=cm&fs=1&to=${correoLimpio}&su=${asunto}`;
+            window.open(urlGmailWeb, '_blank', 'noopener,noreferrer');
+        }
+    } else {
+        setTimeout(() => {
+            if (esNuevaPestana) {
+                window.open(urlDestino, '_blank', 'noopener,noreferrer');
+            } else {
+                window.location.href = urlDestino;
+            }
+        }, 320);
+    }
+}
+
 function configurarReliquiasRitual() {
     const reliquias = document.querySelectorAll('.reliquia-arrastrable');
     if (!reliquias.length || !altarInvocacion) return;
@@ -653,6 +699,14 @@ function configurarReliquiasRitual() {
 
         reliquia.addEventListener('dragstart', (e) => e.preventDefault());
         reliquia.addEventListener('click', (e) => e.preventDefault());
+
+        reliquia.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const { centroAltarX, centroAltarY } = calcularDistanciaAltar(reliquia);
+                ejecutarAccionReliquia(reliquia, centroAltarX, centroAltarY);
+            }
+        });
 
         reliquia.addEventListener('pointerdown', (e) => {
             arrastrando = true;
@@ -696,23 +750,7 @@ function configurarReliquiasRitual() {
             const { distancia, centroAltarX, centroAltarY } = calcularDistanciaAltar(reliquia);
 
             if (seMovio && distancia < CONFIG.RADIO_ALTAR) {
-                for (const p of particulas) {
-                    const ang = atan2(p.y - centroAltarY, p.x - centroAltarX);
-                    const impulso = random(4, 11);
-                    p.vx += cos(ang) * impulso;
-                    p.vy += sin(ang) * impulso;
-                }
-
-                const urlDestino = reliquia.getAttribute('href');
-                const esNuevaPestana = reliquia.getAttribute('target') === '_blank';
-
-                setTimeout(() => {
-                    if (esNuevaPestana) {
-                        window.open(urlDestino, '_blank', 'noopener,noreferrer');
-                    } else {
-                        window.location.href = urlDestino;
-                    }
-                }, 320);
+                ejecutarAccionReliquia(reliquia, centroAltarX, centroAltarY);
             }
 
             altarInvocacion.classList.remove('activo');
@@ -816,6 +854,7 @@ class Particula {
         this.ritualX = ritualX;
         this.ritualY = ritualY;
         this.esEspora = esEspora;
+        this.esSello = random() < 0.45;
         this.luz = luz;
 
         const anguloEspora = random(TWO_PI);
@@ -891,7 +930,7 @@ class Particula {
         let objetivoX, objetivoY;
 
         if (estado === 'LOADER') {
-            if (this.esEspora) {
+            if (this.esSello) {
                 if (ritualCompletado) {
                     const cosA = cos(anguloRitual * 0.4);
                     const sinA = sin(anguloRitual * 0.4);
@@ -918,7 +957,7 @@ class Particula {
 
         let amplitudDeriva = 1.1;
         if (estado === 'LOADER') {
-            if (this.esEspora) {
+            if (this.esSello) {
                 amplitudDeriva = ritualCompletado ? 1.5 : 35;
             } else {
                 amplitudDeriva = 0.7;
@@ -946,7 +985,7 @@ class Particula {
         }
 
         const multRigidez =
-            estado === 'RITUAL' || (estado === 'LOADER' && ritualCompletado && this.esEspora)
+            estado === 'RITUAL' || (estado === 'LOADER' && ritualCompletado && this.esSello)
                 ? 0.85 + intensidadRitual * 0.5
                 : 0.9;
 
@@ -963,7 +1002,7 @@ class Particula {
 
         let tam;
         if (estado === 'LOADER') {
-            tam = this.esEspora && ritualCompletado ? this.tamanoFlujo : this.tamanoTexto;
+            tam = this.esSello && ritualCompletado ? this.tamanoFlujo : this.tamanoTexto;
         } else if (estado === 'PERFIL' && !this.esEspora) {
             tam = this.tamanoPerfil;
         } else if (estado === 'RITUAL') {
