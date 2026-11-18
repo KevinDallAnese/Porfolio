@@ -1000,7 +1000,14 @@ a:focus {
 
     .perfil-texto h2 {
     position: relative;
+    text-align: left; /* Alineado a la izquierda */
+    font-size: var(--texto-l);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--espacio-2);
     padding-bottom: var(--espacio-2);
+    text-shadow: 0 2px 18px var(--color-sombra), 0 0 24px var(--color-marca-glow);
 }
 
     .perfil-texto h2::after {
@@ -1014,9 +1021,7 @@ a:focus {
     }
 
     .perfil-texto p {
-        font-size: 1.05rem;
-        line-height: 1.8;
-        margin-inline: 0;
+    text-align: left; /* Texto descriptivo también alineado a la izquierda para mantener simetría */
     }
 
     .tarjeta-proyecto-hero {
