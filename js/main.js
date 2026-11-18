@@ -555,12 +555,13 @@ function configurarCambioRetrato() {
 
     const carruselMovil = document.getElementById('carrusel-retrato-movil');
     const puntosRetrato = document.querySelectorAll('.punto-retrato');
+    const totalRetratos = mapasRetratos.length;
 
     const activarRetrato = (nuevoIndice, conImpulso = true) => {
-        if (nuevoIndice === indiceRetratoActual) return;
-        if (!mapasRetratos[nuevoIndice] || !mapasRetratos[nuevoIndice].length) return;
+        // Lógica de bucle infinito circular (si pasa del último, vuelve al 0, y viceversa)
+        indiceRetratoActual = (nuevoIndice + totalRetratos) % totalRetratos;
+        if (!mapasRetratos[indiceRetratoActual] || !mapasRetratos[indiceRetratoActual].length) return;
 
-        indiceRetratoActual = nuevoIndice;
         aplicarMapaRetrato(indiceRetratoActual);
 
         puntosRetrato.forEach((btn, idx) => {
@@ -583,37 +584,53 @@ function configurarCambioRetrato() {
         }
     };
 
-    // Escritorio: clic alterna retrato
+    // Escritorio: clic alterna retrato en loop infinito
     anclaPerfil.addEventListener('click', () => {
         if (estado !== 'PERFIL' || window.innerWidth <= CONFIG.BREAKPOINT_MOBILE) return;
-        const siguiente = (indiceRetratoActual + 1) % mapasRetratos.length;
-        activarRetrato(siguiente, true);
+        activarRetrato(indiceRetratoActual + 1, true);
     });
 
-    // Móvil: carrusel lateral por deslizamiento limpio
-    if (carruselMovil) {
-        let timeoutScroll;
-        carruselMovil.addEventListener('scroll', () => {
-            if (window.innerWidth > CONFIG.BREAKPOINT_MOBILE) return;
-
-            clearTimeout(timeoutScroll);
-            timeoutScroll = setTimeout(() => {
-                const anchoSlide = carruselMovil.clientWidth || 1;
-                const indiceSlide = Math.round(carruselMovil.scrollLeft / anchoSlide);
-                const indiceRestringido = constrain(indiceSlide, 0, mapasRetratos.length - 1);
-                activarRetrato(indiceRestringido, true);
-            }, 50);
-        }, { passive: true });
-
-        puntosRetrato.forEach((btn) => {
+    // Móvil: control por puntos indicadores
+    if (puntosRetrato.length) {
+        puntosRetrato.forEach((btn, idx) => {
             btn.addEventListener('click', () => {
-                const idx = Number(btn.dataset.indice) || 0;
-                carruselMovil.scrollTo({
-                    left: idx * carruselMovil.clientWidth,
-                    behavior: 'smooth'
-                });
+                activarRetrato(idx, true);
+                if (carruselMovil) {
+                    carruselMovil.scrollTo({
+                        left: idx * carruselMovil.clientWidth,
+                        behavior: 'smooth'
+                    });
+                }
             });
         });
+    }
+
+    // Móvil: deslizamiento táctil con soporte circular infinito
+    if (carruselMovil) {
+        let touchInicioX = 0;
+        let touchInicioY = 0;
+
+        carruselMovil.addEventListener('touchstart', (e) => {
+            if (window.innerWidth > CONFIG.BREAKPOINT_MOBILE) return;
+            touchInicioX = e.touches[0].clientX;
+            touchInicioY = e.touches[0].clientY;
+        }, { passive: true });
+
+        carruselMovil.addEventListener('touchend', (e) => {
+            if (window.innerWidth > CONFIG.BREAKPOINT_MOBILE) return;
+            const deltaX = e.changedTouches[0].clientX - touchInicioX;
+            const deltaY = e.changedTouches[0].clientY - touchInicioY;
+
+            if (Math.abs(deltaX) > 30 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX < 0) {
+                    // Deslizó hacia la izquierda (avanza al siguiente, loop infinito)
+                    activarRetrato(indiceRetratoActual + 1, true);
+                } else {
+                    // Deslizó hacia la derecha (retrocede al anterior, loop infinito)
+                    activarRetrato(indiceRetratoActual - 1, true);
+                }
+            }
+        }, { passive: true });
     }
 }
 
