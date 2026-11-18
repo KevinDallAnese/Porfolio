@@ -773,28 +773,54 @@ function configurarReliquiasRitual() {
         let arrastrando = false;
         let inicioX = 0;
         let inicioY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let targetX = 0;
+        let targetY = 0;
         let seMovio = false;
+        let animandoId = null;
 
         reliquia.addEventListener('dragstart', (e) => e.preventDefault());
         reliquia.addEventListener('click', (e) => e.preventDefault());
 
-        reliquia.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                const { centroAltarX, centroAltarY } = calcularDistanciaAltar(reliquia);
-                ejecutarAccionReliquia(reliquia, centroAltarX, centroAltarY);
+        const actualizarFisicaArrastre = () => {
+            if (!arrastrando) return;
+            // Interpolación lineal suave (lerp) para eliminar tirones
+            currentX += (targetX - currentX) * 0.28;
+            currentY += (targetY - currentY) * 0.28;
+
+            reliquia.style.transform = `translate(${currentX}px, ${currentY}px) scale(1.05)`;
+
+            const { distancia } = calcularDistanciaAltar(reliquia);
+            const radioMagnetico = CONFIG.RADIO_ALTAR * 1.5;
+
+            if (distancia < radioMagnetico) {
+                altarInvocacion.classList.add('activo');
+                intensidadRitual = map(distancia, 0, radioMagnetico, 1, 0.2);
+            } else {
+                altarInvocacion.classList.remove('activo');
+                intensidadRitual = 0;
             }
-        });
+
+            animandoId = requestAnimationFrame(actualizarFisicaArrastre);
+        };
 
         reliquia.addEventListener('pointerdown', (e) => {
             arrastrando = true;
             seMovio = false;
             inicioX = e.clientX;
             inicioY = e.clientY;
+            targetX = 0;
+            targetY = 0;
+            currentX = 0;
+            currentY = 0;
 
             reliquia.style.transition = 'none';
             reliquia.classList.add('arrastrando');
             reliquia.setPointerCapture(e.pointerId);
+
+            cancelAnimationFrame(animandoId);
+            animandoId = requestAnimationFrame(actualizarFisicaArrastre);
         });
 
         reliquia.addEventListener('pointermove', (e) => {
@@ -802,23 +828,16 @@ function configurarReliquiasRitual() {
 
             const deltaX = e.clientX - inicioX;
             const deltaY = e.clientY - inicioY;
-            if (Math.hypot(deltaX, deltaY) > 6) seMovio = true;
+            if (Math.hypot(deltaX, deltaY) > 5) seMovio = true;
 
-            reliquia.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.06)`;
-
-            const { distancia } = calcularDistanciaAltar(reliquia);
-            if (distancia < CONFIG.RADIO_ALTAR) {
-                altarInvocacion.classList.add('activo');
-                intensidadRitual = map(distancia, 0, CONFIG.RADIO_ALTAR, 1, 0.25);
-            } else {
-                altarInvocacion.classList.remove('activo');
-                intensidadRitual = 0;
-            }
+            targetX = deltaX;
+            targetY = deltaY;
         });
 
         const soltarReliquia = (e) => {
             if (!arrastrando) return;
             arrastrando = false;
+            cancelAnimationFrame(animandoId);
 
             if (reliquia.hasPointerCapture(e.pointerId)) {
                 reliquia.releasePointerCapture(e.pointerId);
@@ -827,14 +846,50 @@ function configurarReliquiasRitual() {
 
             const { distancia, centroAltarX, centroAltarY } = calcularDistanciaAltar(reliquia);
 
-            if (seMovio && distancia < CONFIG.RADIO_ALTAR) {
-                ejecutarAccionReliquia(reliquia, centroAltarX, centroAltarY);
+            // Si hizo tap/clic rápido sin arrastrar mucho, vuela directo al altar
+            if (!seMovio) {
+                const rAltar = altarInvocacion.getBoundingClientRect();
+                const rReliquia = reliquia.getBoundingClientRect();
+                const dx = (rAltar.left + rAltar.width / 2) - (rReliquia.left + rReliquia.width / 2);
+                const dy = (rAltar.top + rAltar.height / 2) - (rReliquia.top + rReliquia.height / 2);
+
+                altarInvocacion.classList.add('activo');
+                intensidadRitual = 1;
+                reliquia.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+                reliquia.style.transform = `translate(${dx}px, ${dy}px) scale(0.9)`;
+
+                setTimeout(() => {
+                    ejecutarAccionReliquia(reliquia, centroAltarX, centroAltarY);
+                    altarInvocacion.classList.remove('activo');
+                    intensidadRitual = 0;
+                    reliquia.style.transform = '';
+                }, 350);
+                return;
             }
 
-            altarInvocacion.classList.remove('activo');
-            intensidadRitual = 0;
-            reliquia.style.transition = 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)';
-            reliquia.style.transform = 'translate(0px, 0px) scale(1)';
+            if (distancia < CONFIG.RADIO_ALTAR) {
+                // Efecto imán de succión al soltar cerca del altar
+                const rAltar = altarInvocacion.getBoundingClientRect();
+                const rRel = reliquia.getBoundingClientRect();
+                const succionX = currentX + ((rAltar.left + rAltar.width / 2) - (rRel.left + rRel.width / 2));
+                const succionY = currentY + ((rAltar.top + rAltar.height / 2) - (rRel.top + rRel.height / 2));
+
+                reliquia.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+                reliquia.style.transform = `translate(${succionX}px, ${succionY}px) scale(0.85)`;
+
+                setTimeout(() => {
+                    ejecutarAccionReliquia(reliquia, centroAltarX, centroAltarY);
+                    altarInvocacion.classList.remove('activo');
+                    intensidadRitual = 0;
+                    reliquia.style.transform = '';
+                }, 250);
+            } else {
+                // Retorno elástico al lugar si lo soltó lejos
+                altarInvocacion.classList.remove('activo');
+                intensidadRitual = 0;
+                reliquia.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+                reliquia.style.transform = 'translate(0px, 0px) scale(1)';
+            }
         };
 
         reliquia.addEventListener('pointerup', soltarReliquia);
