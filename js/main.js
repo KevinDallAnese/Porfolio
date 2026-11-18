@@ -620,10 +620,24 @@ function configurarProfundidadCarrusel() {
     if (!tarjetasOriginales.length) return;
 
     const total = tarjetasOriginales.length;
-    let clonesCreados = false;
-    let tarjetas = [...tarjetasOriginales];
 
-    const centrarTarjetaHorizontal = (tarjeta, suave = false) => {
+    // Limpiar clones previos si existieran
+    galeria.querySelectorAll('.tarjeta-proyecto[data-clon]').forEach(c => c.remove());
+
+    const clonPrimero = tarjetasOriginales[0].cloneNode(true);
+    const clonUltimo = tarjetasOriginales[total - 1].cloneNode(true);
+    
+    clonPrimero.setAttribute('data-clon', 'true');
+    clonUltimo.setAttribute('data-clon', 'true');
+    clonPrimero.setAttribute('aria-hidden', 'true');
+    clonUltimo.setAttribute('aria-hidden', 'true');
+
+    galeria.insertBefore(clonUltimo, tarjetasOriginales[0]);
+    galeria.appendChild(clonPrimero);
+
+    const todasLasTarjetas = Array.from(galeria.querySelectorAll('.tarjeta-proyecto'));
+
+    const centrarEnTarjeta = (tarjeta, suave = true) => {
         if (!tarjeta) return;
         const destinoX = tarjeta.offsetLeft - (galeria.clientWidth - tarjeta.offsetWidth) / 2;
         galeria.scrollTo({
@@ -631,6 +645,15 @@ function configurarProfundidadCarrusel() {
             behavior: suave ? 'smooth' : 'auto'
         });
     };
+
+    const centrarInicial = () => {
+        galeria.style.scrollBehavior = 'auto';
+        centrarEnTarjeta(todasLasTarjetas[1], false);
+        galeria.offsetHeight;
+        galeria.style.scrollBehavior = 'smooth';
+    };
+
+    centrarInicial();
 
     let puntos = [];
     if (contenedorIndicador) {
@@ -641,68 +664,16 @@ function configurarProfundidadCarrusel() {
             btn.className = 'punto-carrusel';
             btn.setAttribute('aria-label', `Ver proyecto ${indice + 1} de ${total}`);
             btn.addEventListener('click', () => {
-                const objetivo = clonesCreados ? tarjetas[indice + 1] : tarjetas[indice];
-                centrarTarjetaHorizontal(objetivo, true);
+                centrarEnTarjeta(todasLasTarjetas[indice + 1], true);
             });
             contenedorIndicador.appendChild(btn);
             return btn;
         });
     }
 
-    const activarBucle360 = () => {
-        if (clonesCreados || total < 2) return;
-        const clonPrimero = tarjetasOriginales[0].cloneNode(true);
-        const clonUltimo = tarjetasOriginales[total - 1].cloneNode(true);
-        clonPrimero.setAttribute('aria-hidden', 'true');
-        clonUltimo.setAttribute('aria-hidden', 'true');
-
-        galeria.insertBefore(clonUltimo, tarjetasOriginales[0]);
-        galeria.appendChild(clonPrimero);
-
-        tarjetas = Array.from(galeria.querySelectorAll('.tarjeta-proyecto'));
-        clonesCreados = true;
-
-        centrarTarjetaHorizontal(tarjetasOriginales[0], false);
-    };
-
-    const desactivarBucle360 = () => {
-        if (!clonesCreados) return;
-        galeria.querySelectorAll('.tarjeta-proyecto[aria-hidden="true"]').forEach((c) => c.remove());
-        tarjetas = [...tarjetasOriginales];
-        clonesCreados = false;
-    };
-
-    let timerSalto;
-    const verificarSaltoInfinito = () => {
-        if (!clonesCreados || window.innerWidth > CONFIG.BREAKPOINT_MOBILE) return;
-
-        const rectGaleria = galeria.getBoundingClientRect();
-        const centroGaleria = rectGaleria.left + rectGaleria.width / 2;
-        let indiceEnDom = 0;
-        let menorDist = Infinity;
-
-        tarjetas.forEach((t, idx) => {
-            const r = t.getBoundingClientRect();
-            const d = Math.abs(centroGaleria - (r.left + r.width / 2));
-            if (d < menorDist) {
-                menorDist = d;
-                indiceEnDom = idx;
-            }
-        });
-
-        if (menorDist < 8) {
-            if (indiceEnDom === 0) {
-                centrarTarjetaHorizontal(tarjetas[total], false);
-            } else if (indiceEnDom === total + 1) {
-                centrarTarjetaHorizontal(tarjetas[1], false);
-            }
-        }
-    };
-
     const actualizarFocoTarjetas = () => {
         if (window.innerWidth > CONFIG.BREAKPOINT_MOBILE) {
-            desactivarBucle360();
-            tarjetas.forEach((tarjeta) => {
+            todasLasTarjetas.forEach((tarjeta) => {
                 tarjeta.style.transform = '';
                 tarjeta.style.filter = '';
                 tarjeta.style.opacity = '';
@@ -711,14 +682,12 @@ function configurarProfundidadCarrusel() {
             return;
         }
 
-        activarBucle360();
-
         const rectGaleria = galeria.getBoundingClientRect();
         const centroGaleria = rectGaleria.left + rectGaleria.width / 2;
         let indiceActivoDom = 1;
         let menorDistancia = Infinity;
 
-        tarjetas.forEach((tarjeta, indice) => {
+        todasLasTarjetas.forEach((tarjeta, indice) => {
             const rectTarjeta = tarjeta.getBoundingClientRect();
             const centroTarjeta = rectTarjeta.left + rectTarjeta.width / 2;
             const distanciaPx = Math.abs(centroGaleria - centroTarjeta);
@@ -740,17 +709,30 @@ function configurarProfundidadCarrusel() {
             tarjeta.style.pointerEvents = distanciaNorm > 0.45 ? 'none' : 'auto';
         });
 
-        const indiceReal = clonesCreados ? (indiceActivoDom - 1 + total) % total : indiceActivoDom;
+        const indiceReal = (indiceActivoDom - 1 + total) % total;
         puntos.forEach((punto, indice) => {
             punto.classList.toggle('activo', indice === indiceReal);
         });
 
-        clearTimeout(timerSalto);
-        timerSalto = setTimeout(verificarSaltoInfinito, 90);
+        // Verificación de salto instantáneo limpio sin parpadeo
+        const tarjetaInicioReal = todasLasTarjetas[1];
+        const tarjetaFinReal = todasLasTarjetas[total];
+
+        if (indiceActivoDom === 0) {
+            galeria.style.scrollBehavior = 'auto';
+            centrarEnTarjeta(tarjetaFinReal, false);
+            galeria.offsetHeight; // Forzar reflow síncrono para evitar el parpadeo
+            galeria.style.scrollBehavior = 'smooth';
+        } else if (indiceActivoDom === total + 1) {
+            galeria.style.scrollBehavior = 'auto';
+            centrarEnTarjeta(tarjetaInicioReal, false);
+            galeria.offsetHeight; // Forzar reflow síncrono para evitar el parpadeo
+            galeria.style.scrollBehavior = 'smooth';
+        }
     };
 
     galeria.addEventListener('scroll', actualizarFocoTarjetas, { passive: true });
-    window.addEventListener('resize', actualizarFocoTarjetas);
+    window.addEventListener('resize', centrarInicial);
     actualizarFocoTarjetas();
 }
 
