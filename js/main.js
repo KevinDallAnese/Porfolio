@@ -11,6 +11,7 @@ const CONFIG = {
 
 let particulas = [];
 let spriteMarca;
+let spriteCanvas;
 let estado = 'LOADER';
 
 let anclaPerfil;
@@ -41,6 +42,7 @@ let ultimoModoMobile = null;
 function crearSpriteMarca() {
     const { r, g, b } = CONFIG.COLOR_MARCA;
     const pg = createGraphics(48, 48);
+    pg.pixelDensity(1);
     const ctx = pg.drawingContext;
     const grad = ctx.createRadialGradient(24, 24, 0, 24, 24, 24);
 
@@ -51,6 +53,7 @@ function crearSpriteMarca() {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 48, 48);
     spriteMarca = pg;
+    spriteCanvas = pg.canvas;
 }
 
 function muestrearPuntosTexto(esMobile, objetivo) {
@@ -61,12 +64,12 @@ function muestrearPuntosTexto(esMobile, objetivo) {
     pg.textFont('Georgia, Times New Roman, serif');
     pg.textAlign(CENTER, CENTER);
     pg.textStyle(BOLD);
-    pg.textSize(esMobile ? constrain(width * 0.115, 26, 36) : 64);
+    pg.textSize(esMobile ? constrain(width * 0.145, 34, 48) : 86);
     pg.text('KEVIN D.D', width / 2, height / 2);
     pg.loadPixels();
 
-    const cajaAncho = esMobile ? width * 0.94 : 550;
-    const cajaAlto = esMobile ? 120 : 180;
+    const cajaAncho = esMobile ? width * 0.96 : 740;
+    const cajaAlto = esMobile ? 150 : 220;
     const minX = max(0, floor(width / 2 - cajaAncho / 2));
     const maxX = min(width, floor(width / 2 + cajaAncho / 2));
     const minY = max(0, floor(height / 2 - cajaAlto / 2));
@@ -75,7 +78,7 @@ function muestrearPuntosTexto(esMobile, objetivo) {
     const puntos = [];
     let intentos = 0;
 
-    while (puntos.length < objetivo && intentos < 45000) {
+    while (puntos.length < objetivo && intentos < 50000) {
         intentos++;
         const rx = floor(random(minX, maxX));
         const ry = floor(random(minY, maxY));
@@ -195,12 +198,12 @@ function cargarPuntosRetratos(anchoImg, altoImg) {
 }
 
 function setup() {
-    pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+    const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
+    pixelDensity(esMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2));
 
     canvasGlobal = createCanvas(windowWidth, windowHeight);
     canvasGlobal.id('canvas-global-particulas');
     canvasGlobal.style('background', 'transparent');
-    imageMode(CENTER);
 
     crearSpriteMarca();
 
@@ -214,9 +217,8 @@ function setup() {
         contenedorSnap.style.overflowY = 'hidden';
     }
 
-    const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
     ultimoModoMobile = esMobile;
-    const totalParticulas = esMobile ? 950 : 1600;
+    const totalParticulas = esMobile ? 750 : 1550;
     const anchoImg = esMobile ? 210 : 260;
     const altoImg = esMobile ? 275 : 350;
 
@@ -275,7 +277,7 @@ function obtenerNodosSello(esMobile) {
 }
 
 function emitirChispaLoader(x, y, vx, vy, tam, desgaste) {
-    if (chispasLoader.length > 260) {
+    if (chispasLoader.length > 220) {
         chispasLoader.shift();
     }
     chispasLoader.push({
@@ -291,7 +293,7 @@ function emitirChispaLoader(x, y, vx, vy, tam, desgaste) {
 }
 
 function dibujarFilamentoOrganico(ctx, p1, p2, tiempo, intensidad) {
-    const pasos = 26;
+    const pasos = 24;
     const dx = p2.x - p1.x;
     const dy = p2.y - p1.y;
     const distTotal = Math.hypot(dx, dy) || 1;
@@ -324,7 +326,7 @@ function dibujarFilamentoOrganico(ctx, p1, p2, tiempo, intensidad) {
         const by = lerp(p1.y, p2.y, fase) + ny * onda;
 
         ctx.globalAlpha = 0.85 * intensidad;
-        image(spriteMarca, bx, by, 9, 9);
+        ctx.drawImage(spriteCanvas, bx - 4.5, by - 4.5, 9, 9);
     }
 }
 
@@ -332,8 +334,6 @@ function dibujarRitualNodosLoader(ctx, esMobile, punteroX, punteroY) {
     const { nodos } = obtenerNodosSello(esMobile);
     const { r, g, b } = CONFIG.COLOR_MARCA;
     const tiempo = frameCount * 0.02;
-
-    ctx.save();
 
     if (nodosEncendidos.length > 1) {
         for (let i = 0; i < nodosEncendidos.length - 1; i++) {
@@ -378,6 +378,7 @@ function dibujarRitualNodosLoader(ctx, esMobile, punteroX, punteroY) {
         grad.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${activo ? 0.28 : 0.14})`);
         grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
+        ctx.globalAlpha = 1;
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(nodo.x, nodo.y, radioNucleo, 0, TWO_PI);
@@ -399,10 +400,9 @@ function dibujarRitualNodosLoader(ctx, esMobile, punteroX, punteroY) {
 
         ctx.globalAlpha = sin(c.vida * PI) * 0.9;
         const tamActual = c.tam * (0.45 + c.vida * 0.65);
-        image(spriteMarca, c.x, c.y, tamActual, tamActual);
+        const mitad = tamActual * 0.5;
+        ctx.drawImage(spriteCanvas, c.x - mitad, c.y - mitad, tamActual, tamActual);
     }
-
-    ctx.restore();
 }
 
 function configurarRitualEntrada() {
@@ -553,27 +553,62 @@ function configurarCierreModalEscape() {
 function configurarCambioRetrato() {
     if (!anclaPerfil) return;
 
-    anclaPerfil.addEventListener('click', () => {
-        if (estado !== 'PERFIL') return;
-        const siguiente = (indiceRetratoActual + 1) % mapasRetratos.length;
-        if (!mapasRetratos[siguiente] || !mapasRetratos[siguiente].length) return;
+    const carruselMovil = document.getElementById('carrusel-retrato-movil');
+    const puntosRetrato = document.querySelectorAll('.punto-retrato');
 
-        indiceRetratoActual = siguiente;
+    const activarRetrato = (nuevoIndice, conImpulso = true) => {
+        if (nuevoIndice === indiceRetratoActual) return;
+        if (!mapasRetratos[nuevoIndice] || !mapasRetratos[nuevoIndice].length) return;
+
+        indiceRetratoActual = nuevoIndice;
         aplicarMapaRetrato(indiceRetratoActual);
 
-        const rect = anclaPerfil.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
+        puntosRetrato.forEach((btn, idx) => {
+            btn.classList.toggle('activo', idx === indiceRetratoActual);
+        });
 
-        for (const p of particulas) {
-            if (!p.esEspora) {
-                const ang = atan2(p.y - cy, p.x - cx);
-                const impulso = random(1.8, 4.5);
-                p.vx += cos(ang) * impulso;
-                p.vy += sin(ang) * impulso;
+        if (conImpulso) {
+            const rect = anclaPerfil.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+
+            for (const p of particulas) {
+                if (!p.esEspora) {
+                    const ang = atan2(p.y - cy, p.x - cx);
+                    const impulso = random(1.6, 4.0);
+                    p.vx += cos(ang) * impulso;
+                    p.vy += sin(ang) * impulso;
+                }
             }
         }
+    };
+
+    // Escritorio: clic alterna retrato
+    anclaPerfil.addEventListener('click', () => {
+        if (estado !== 'PERFIL' || window.innerWidth <= CONFIG.BREAKPOINT_MOBILE) return;
+        const siguiente = (indiceRetratoActual + 1) % mapasRetratos.length;
+        activarRetrato(siguiente, true);
     });
+
+    // Móvil: carrusel lateral por deslizamiento y rombos indicadores
+    if (carruselMovil) {
+        carruselMovil.addEventListener('scroll', () => {
+            if (window.innerWidth > CONFIG.BREAKPOINT_MOBILE) return;
+            const anchoSlide = carruselMovil.clientWidth || 1;
+            const indiceSlide = Math.round(carruselMovil.scrollLeft / anchoSlide);
+            activarRetrato(constrain(indiceSlide, 0, mapasRetratos.length - 1), true);
+        }, { passive: true });
+
+        puntosRetrato.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const idx = Number(btn.dataset.indice) || 0;
+                carruselMovil.scrollTo({
+                    left: idx * carruselMovil.clientWidth,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    }
 }
 
 function configurarProfundidadCarrusel() {
@@ -891,8 +926,11 @@ function draw() {
     const tiempo = frameCount * 0.014;
     const ctx = drawingContext;
 
-    const punteroX = touches.length > 0 ? touches[0].x : mouseX;
-    const punteroY = touches.length > 0 ? touches[0].y : mouseY;
+    // En móvil solo hay puntero activo mientras se toca la pantalla
+    const hayToqueActivo = touches.length > 0;
+    const punteroActivo = esMobile ? hayToqueActivo : (mouseX > 0 || mouseY > 0);
+    const punteroX = hayToqueActivo ? touches[0].x : (esMobile ? -9999 : mouseX);
+    const punteroY = hayToqueActivo ? touches[0].y : (esMobile ? -9999 : mouseY);
 
     if (estado === 'LOADER') {
         if (ritualCompletado) {
@@ -912,9 +950,14 @@ function draw() {
         }
     }
 
-    const velMouseX = constrain(punteroX - prevMouseX, -30, 30);
-    const velMouseY = constrain(punteroY - prevMouseY, -30, 30);
-    const mouseEnMovimiento = abs(velMouseX) + abs(velMouseY) > 0.5;
+    // En móvil, en las secciones de proyectos liberamos la GPU dejando el canvas vacío
+    if (esMobile && estado === 'FLUJO') {
+        return;
+    }
+
+    const velMouseX = punteroActivo ? constrain(punteroX - prevMouseX, -30, 30) : 0;
+    const velMouseY = punteroActivo ? constrain(punteroY - prevMouseY, -30, 30) : 0;
+    const mouseEnMovimiento = punteroActivo && (abs(velMouseX) + abs(velMouseY) > 0.5);
 
     prevMouseX = punteroX;
     prevMouseY = punteroY;
@@ -942,7 +985,8 @@ function draw() {
             punteroY,
             velMouseX,
             velMouseY,
-            mouseEnMovimiento
+            mouseEnMovimiento,
+            punteroActivo
         );
         particulas[i].show(ctx);
     }
@@ -951,9 +995,10 @@ function draw() {
 }
 
 function windowResized() {
+    const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
+    pixelDensity(esMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2));
     resizeCanvas(windowWidth, windowHeight);
 
-    const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
     const nuevosPuntosTexto = muestrearPuntosTexto(esMobile, particulas.length);
     const nuevosPuntosRitual = generarPuntosRitual(particulas.length, esMobile);
 
@@ -1003,8 +1048,8 @@ class Particula {
         this.rigidez = random(0.025, 0.055);
         this.friccion = random(0.70, 0.78);
 
-        this.tamanoTexto = esMobile ? random(3.2, 5.5) : random(4, 7.5);
-        this.tamanoPerfil = map(this.luz, 0, 1, esMobile ? 2.0 : 1.6, esMobile ? 4.0 : 3.4);
+        this.tamanoTexto = esMobile ? random(4.2, 6.8) : random(5, 8.5);
+        this.tamanoPerfil = map(this.luz, 0, 1, esMobile ? 2.1 : 1.6, esMobile ? 4.2 : 3.4);
         this.tamanoFlujo = esMobile ? random(3, 6) : random(2.5, 5.5);
 
         this.vida = random(0, 1);
@@ -1024,7 +1069,7 @@ class Particula {
         this.imgOffsetY = imgOffsetY;
         this.luz = luz;
         const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
-        this.tamanoPerfil = map(this.luz, 0, 1, esMobile ? 2.0 : 1.6, esMobile ? 4.0 : 3.4);
+        this.tamanoPerfil = map(this.luz, 0, 1, esMobile ? 2.1 : 1.6, esMobile ? 4.2 : 3.4);
     }
 
     renacerEnCursor(punteroX, punteroY, velMouseX, velMouseY) {
@@ -1038,14 +1083,14 @@ class Particula {
         this.vida = 1.0;
     }
 
-    update(rectAncla, tiempo, anguloRitual, centroSelloX, centroSelloY, punteroX, punteroY, velMouseX, velMouseY, mouseEnMovimiento) {
+    update(rectAncla, tiempo, anguloRitual, centroSelloX, centroSelloY, punteroX, punteroY, velMouseX, velMouseY, mouseEnMovimiento, punteroActivo) {
         const esModoHumo = estado === 'FLUJO' || (estado === 'PERFIL' && this.esEspora);
 
         if (esModoHumo) {
             this.vida -= this.velDesgaste;
 
             if (this.vida <= 0) {
-                if (mouseEnMovimiento && (punteroX > 0 || punteroY > 0)) {
+                if (mouseEnMovimiento) {
                     this.renacerEnCursor(punteroX, punteroY, velMouseX, velMouseY);
                 } else {
                     this.vida = 0;
@@ -1111,16 +1156,18 @@ class Particula {
         objetivoX += (n - 0.5) * 2 * amplitudDeriva;
         objetivoY += ((1 - n) - 0.5) * 2 * amplitudDeriva;
 
-        const radioRepulsion = estado === 'LOADER' ? 75 : 60;
-        const dx = this.x - punteroX;
-        const dy = this.y - punteroY;
-        const distSq = dx * dx + dy * dy;
+        if (punteroActivo) {
+            const radioRepulsion = estado === 'LOADER' ? 75 : 60;
+            const dx = this.x - punteroX;
+            const dy = this.y - punteroY;
+            const distSq = dx * dx + dy * dy;
 
-        if (distSq < radioRepulsion * radioRepulsion && distSq > 0.01) {
-            const d = Math.sqrt(distSq);
-            const fuerza = (1 - d / radioRepulsion) * 2.2;
-            this.vx += (dx / d) * fuerza;
-            this.vy += (dy / d) * fuerza;
+            if (distSq < radioRepulsion * radioRepulsion && distSq > 0.01) {
+                const d = Math.sqrt(distSq);
+                const fuerza = (1 - d / radioRepulsion) * 2.2;
+                this.vx += (dx / d) * fuerza;
+                this.vy += (dy / d) * fuerza;
+            }
         }
 
         const multRigidez =
@@ -1150,21 +1197,8 @@ class Particula {
             tam = this.tamanoFlujo * (0.4 + this.vida * 0.8);
         }
 
-        const velSq = this.vx * this.vx + this.vy * this.vy;
         ctx.globalAlpha = esModoHumo ? sin(this.vida * PI) * 0.85 : this.vida;
-
-        if (velSq > 1.5) {
-            const vel = Math.sqrt(velSq);
-            const angulo = Math.atan2(this.vy, this.vx);
-            const estiramiento = min(vel * 0.42, 3.2);
-
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(angulo);
-            image(spriteMarca, 0, 0, tam * (1 + estiramiento), tam * 0.85);
-            ctx.restore();
-        } else {
-            image(spriteMarca, this.x, this.y, tam, tam);
-        }
+        const mitad = tam * 0.5;
+        ctx.drawImage(spriteCanvas, this.x - mitad, this.y - mitad, tam, tam);
     }
 }
