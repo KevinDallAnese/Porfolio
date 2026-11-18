@@ -32,6 +32,7 @@ let chispasLoader = [];
 
 let mapasRetratos = [[], []];
 let indiceRetratoActual = 0;
+let ultimoModoMobile = null;
 
 /* ==========================================================================
    2. INICIALIZACIÓN Y MUESTREO DE PARTÍCULAS
@@ -56,15 +57,15 @@ function muestrearPuntosTexto(esMobile, objetivo) {
     const pg = createGraphics(width, height);
     pg.background(0);
     pg.fill(255);
-    pg.textFont('Cinzel, Georgia, serif');
+    pg.textFont('Georgia, Times New Roman, serif');
     pg.textAlign(CENTER, CENTER);
     pg.textStyle(BOLD);
-    pg.textSize(esMobile ? 32 : 64);
+    pg.textSize(esMobile ? 28 : 64);
     pg.text('KEVIN D.D', width / 2, height / 2);
     pg.loadPixels();
 
-    const cajaAncho = esMobile ? width * 0.9 : 550;
-    const cajaAlto = esMobile ? 120 : 180;
+    const cajaAncho = esMobile ? width * 0.92 : 550;
+    const cajaAlto = esMobile ? 100 : 180;
     const minX = max(0, floor(width / 2 - cajaAncho / 2));
     const maxX = min(width, floor(width / 2 + cajaAncho / 2));
     const minY = max(0, floor(height / 2 - cajaAlto / 2));
@@ -81,8 +82,8 @@ function muestrearPuntosTexto(esMobile, objetivo) {
 
         if (pg.pixels[idx] > 128) {
             puntos.push({
-                x: rx + random(-0.8, 0.8),
-                y: ry + random(-0.8, 0.8)
+                x: rx + random(-0.4, 0.4),
+                y: ry + random(-0.4, 0.4)
             });
         }
     }
@@ -92,8 +93,8 @@ function muestrearPuntosTexto(esMobile, objetivo) {
     if (puntos.length === 0) {
         for (let i = 0; i < 400; i++) {
             puntos.push({
-                x: width / 2 + random(-150, 150),
-                y: height / 2 + random(-30, 30)
+                x: width / 2 + random(-140, 140),
+                y: height / 2 + random(-28, 28)
             });
         }
     }
@@ -206,6 +207,7 @@ function setup() {
     }
 
     const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
+    ultimoModoMobile = esMobile;
     const totalParticulas = esMobile ? 800 : 1600;
     const anchoImg = esMobile ? 150 : 260;
     const altoImg = esMobile ? 200 : 350;
@@ -239,19 +241,8 @@ function setup() {
     configurarCierreNavbarMovil();
     configurarProfundidadCarrusel();
     configurarCambioRetrato();
-
-    if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => {
-            const nuevosPuntosTexto = muestrearPuntosTexto(esMobile, totalParticulas);
-            for (let i = 0; i < particulas.length; i++) {
-                const pt = nuevosPuntosTexto[i % nuevosPuntosTexto.length];
-                particulas[i].textoX = pt.x;
-                particulas[i].textoY = pt.y;
-            }
-        });
-    }
+    configurarCierreModalEscape();
 }
-
 
 /* ==========================================================================
    3. RITUAL DE ENTRADA (LLAMAS DE BRASAS Y MATERIALIZACIÓN DEL SELLO)
@@ -408,6 +399,7 @@ function dibujarRitualNodosLoader(ctx, esMobile, punteroX, punteroY) {
 
 function configurarRitualEntrada() {
     const velo = document.getElementById('loader-overlay');
+    const textoGuia = document.getElementById('loader-texto-guia');
     if (!velo) return;
 
     const liberarWeb = () => {
@@ -488,6 +480,7 @@ function configurarRitualEntrada() {
         evaluarConexionNodos(e.clientX, e.clientY);
     });
 
+    let timerAvisoLoader;
     const cancelarTrazo = (e) => {
         if (!trazandoLoader) return;
         trazandoLoader = false;
@@ -495,6 +488,13 @@ function configurarRitualEntrada() {
             velo.releasePointerCapture(e.pointerId);
         }
         if (!ritualCompletado) {
+            if (nodosEncendidos.length > 0 && textoGuia) {
+                textoGuia.textContent = 'Mantené presionado y uní los tres puntos';
+                clearTimeout(timerAvisoLoader);
+                timerAvisoLoader = setTimeout(() => {
+                    textoGuia.textContent = 'Uní las llamas para completar el sello';
+                }, 2400);
+            }
             nodosEncendidos = [];
         }
     };
@@ -512,7 +512,7 @@ function configurarRitualEntrada() {
 }
 
 /* ==========================================================================
-   4. INTERACCIÓN DOM (NAVBAR, CARRUSEL, RETRATO Y RELIQUIAS)
+   4. INTERACCIÓN DOM (NAVBAR, MODALES, CARRUSEL, RETRATO Y RELIQUIAS)
    ========================================================================== */
 
 function configurarCierreNavbarMovil() {
@@ -527,10 +527,22 @@ function configurarCierreNavbarMovil() {
     });
 }
 
+function configurarCierreModalEscape() {
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && window.location.hash.startsWith('#modal-')) {
+            const modalActivo = document.querySelector(window.location.hash);
+            const enlaceCierre = modalActivo ? modalActivo.querySelector('.modal-cerrar') : null;
+            if (enlaceCierre) {
+                enlaceCierre.click();
+            }
+        }
+    });
+}
+
 function configurarCambioRetrato() {
     if (!anclaPerfil) return;
 
-    const alternarImagen = () => {
+    anclaPerfil.addEventListener('click', () => {
         if (estado !== 'PERFIL') return;
         const siguiente = (indiceRetratoActual + 1) % mapasRetratos.length;
         if (!mapasRetratos[siguiente] || !mapasRetratos[siguiente].length) return;
@@ -550,14 +562,6 @@ function configurarCambioRetrato() {
                 p.vy += sin(ang) * impulso;
             }
         }
-    };
-
-    anclaPerfil.addEventListener('click', alternarImagen);
-    anclaPerfil.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            alternarImagen();
-        }
     });
 }
 
@@ -566,19 +570,24 @@ function configurarProfundidadCarrusel() {
     const contenedorIndicador = document.querySelector('.indicador-carrusel');
     if (!galeria) return;
 
-    const tarjetas = Array.from(galeria.querySelectorAll('.tarjeta-proyecto'));
-    if (!tarjetas.length) return;
+    const tarjetasOriginales = Array.from(galeria.querySelectorAll('.tarjeta-proyecto'));
+    if (!tarjetasOriginales.length) return;
+
+    const total = tarjetasOriginales.length;
+    let clonesCreados = false;
+    let tarjetas = [...tarjetasOriginales];
 
     let puntos = [];
     if (contenedorIndicador) {
         contenedorIndicador.innerHTML = '';
-        puntos = tarjetas.map((_, indice) => {
+        puntos = tarjetasOriginales.map((_, indice) => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'punto-carrusel';
-            btn.setAttribute('aria-label', `Ver proyecto ${indice + 1} de ${tarjetas.length}`);
+            btn.setAttribute('aria-label', `Ver proyecto ${indice + 1} de ${total}`);
             btn.addEventListener('click', () => {
-                tarjetas[indice].scrollIntoView({
+                const objetivo = clonesCreados ? tarjetas[indice + 1] : tarjetas[indice];
+                objetivo.scrollIntoView({
                     behavior: 'smooth',
                     block: 'nearest',
                     inline: 'center'
@@ -589,8 +598,71 @@ function configurarProfundidadCarrusel() {
         });
     }
 
+    const activarBucle360 = () => {
+        if (clonesCreados || total < 2) return;
+        const clonPrimero = tarjetasOriginales[0].cloneNode(true);
+        const clonUltimo = tarjetasOriginales[total - 1].cloneNode(true);
+        clonPrimero.setAttribute('aria-hidden', 'true');
+        clonUltimo.setAttribute('aria-hidden', 'true');
+
+        galeria.insertBefore(clonUltimo, tarjetasOriginales[0]);
+        galeria.appendChild(clonPrimero);
+
+        tarjetas = Array.from(galeria.querySelectorAll('.tarjeta-proyecto'));
+        clonesCreados = true;
+
+        galeria.style.scrollBehavior = 'auto';
+        tarjetasOriginales[0].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+        requestAnimationFrame(() => {
+            galeria.style.scrollBehavior = 'smooth';
+        });
+    };
+
+    const desactivarBucle360 = () => {
+        if (!clonesCreados) return;
+        galeria.querySelectorAll('.tarjeta-proyecto[aria-hidden="true"]').forEach((c) => c.remove());
+        tarjetas = [...tarjetasOriginales];
+        clonesCreados = false;
+    };
+
+    let timerSalto;
+    const verificarSaltoInfinito = () => {
+        if (!clonesCreados || window.innerWidth > CONFIG.BREAKPOINT_MOBILE) return;
+
+        const rectGaleria = galeria.getBoundingClientRect();
+        const centroGaleria = rectGaleria.left + rectGaleria.width / 2;
+        let indiceEnDom = 0;
+        let menorDist = Infinity;
+
+        tarjetas.forEach((t, idx) => {
+            const r = t.getBoundingClientRect();
+            const d = Math.abs(centroGaleria - (r.left + r.width / 2));
+            if (d < menorDist) {
+                menorDist = d;
+                indiceEnDom = idx;
+            }
+        });
+
+        if (menorDist < 8) {
+            if (indiceEnDom === 0) {
+                galeria.style.scrollBehavior = 'auto';
+                tarjetas[total].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+                requestAnimationFrame(() => {
+                    galeria.style.scrollBehavior = 'smooth';
+                });
+            } else if (indiceEnDom === total + 1) {
+                galeria.style.scrollBehavior = 'auto';
+                tarjetas[1].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+                requestAnimationFrame(() => {
+                    galeria.style.scrollBehavior = 'smooth';
+                });
+            }
+        }
+    };
+
     const actualizarFocoTarjetas = () => {
         if (window.innerWidth > CONFIG.BREAKPOINT_MOBILE) {
+            desactivarBucle360();
             tarjetas.forEach((tarjeta) => {
                 tarjeta.style.transform = '';
                 tarjeta.style.filter = '';
@@ -600,9 +672,11 @@ function configurarProfundidadCarrusel() {
             return;
         }
 
+        activarBucle360();
+
         const rectGaleria = galeria.getBoundingClientRect();
         const centroGaleria = rectGaleria.left + rectGaleria.width / 2;
-        let indiceActivo = 0;
+        let indiceActivoDom = 1;
         let menorDistancia = Infinity;
 
         tarjetas.forEach((tarjeta, indice) => {
@@ -612,7 +686,7 @@ function configurarProfundidadCarrusel() {
 
             if (distanciaPx < menorDistancia) {
                 menorDistancia = distanciaPx;
-                indiceActivo = indice;
+                indiceActivoDom = indice;
             }
 
             const distanciaNorm = Math.min(1, distanciaPx / (rectGaleria.width * 0.75));
@@ -627,9 +701,13 @@ function configurarProfundidadCarrusel() {
             tarjeta.style.pointerEvents = distanciaNorm > 0.45 ? 'none' : 'auto';
         });
 
+        const indiceReal = clonesCreados ? (indiceActivoDom - 1 + total) % total : indiceActivoDom;
         puntos.forEach((punto, indice) => {
-            punto.classList.toggle('activo', indice === indiceActivo);
+            punto.classList.toggle('activo', indice === indiceReal);
         });
+
+        clearTimeout(timerSalto);
+        timerSalto = setTimeout(verificarSaltoInfinito, 90);
     };
 
     galeria.addEventListener('scroll', actualizarFocoTarjetas, { passive: true });
@@ -851,6 +929,27 @@ function draw() {
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+
+    const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
+    const nuevosPuntosTexto = muestrearPuntosTexto(esMobile, particulas.length);
+    const nuevosPuntosRitual = generarPuntosRitual(particulas.length, esMobile);
+
+    for (let i = 0; i < particulas.length; i++) {
+        const ptTexto = nuevosPuntosTexto[i % nuevosPuntosTexto.length];
+        const ptRitual = nuevosPuntosRitual[i];
+        particulas[i].textoX = ptTexto.x;
+        particulas[i].textoY = ptTexto.y;
+        particulas[i].ritualX = ptRitual.x;
+        particulas[i].ritualY = ptRitual.y;
+        particulas[i].recalcularEspora();
+    }
+
+    if (ultimoModoMobile !== esMobile) {
+        ultimoModoMobile = esMobile;
+        const anchoImg = esMobile ? 150 : 260;
+        const altoImg = esMobile ? 200 : 350;
+        cargarPuntosRetratos(anchoImg, altoImg);
+    }
 }
 
 /* ==========================================================================
@@ -869,10 +968,7 @@ class Particula {
         this.esSello = random() < 0.45;
         this.luz = luz;
 
-        const anguloEspora = random(TWO_PI);
-        const factorDistancia = pow(random(), 0.75);
-        this.esporaX = width / 2 + cos(anguloEspora) * (factorDistancia * width * 0.48);
-        this.esporaY = height / 2 + sin(anguloEspora) * (factorDistancia * height * 0.46);
+        this.recalcularEspora();
 
         const anguloInicio = random(TWO_PI);
         const radioInicio = random(50, max(width, height) * 0.6);
@@ -884,13 +980,20 @@ class Particula {
         this.rigidez = random(0.025, 0.055);
         this.friccion = random(0.70, 0.78);
 
-        this.tamanoTexto = esMobile ? random(4.5, 8) : random(4, 7.5);
+        this.tamanoTexto = esMobile ? random(3.2, 5.5) : random(4, 7.5);
         this.tamanoPerfil = map(this.luz, 0, 1, 1.6, 3.4);
         this.tamanoFlujo = esMobile ? random(3, 6) : random(2.5, 5.5);
 
         this.vida = random(0, 1);
         this.velDesgaste = random(0.012, 0.028);
         this.noiseOffset = random(1000);
+    }
+
+    recalcularEspora() {
+        const anguloEspora = random(TWO_PI);
+        const factorDistancia = pow(random(), 0.75);
+        this.esporaX = width / 2 + cos(anguloEspora) * (factorDistancia * width * 0.48);
+        this.esporaY = height / 2 + sin(anguloEspora) * (factorDistancia * height * 0.46);
     }
 
     asignarDestinoImagen(imgOffsetX, imgOffsetY, luz) {
