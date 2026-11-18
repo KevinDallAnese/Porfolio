@@ -16,7 +16,7 @@
 
     <div id="loader-overlay" class="loader-velo">
         <div class="loader-pie">
-            <p class="loader-indication">Uní las llamas para completar el sello</p>
+            <p id="loader-texto-guia" class="loader-indication">Uní las llamas para completar el sello</p>
         </div>
     </div>
 
@@ -49,10 +49,12 @@
         <!-- SECCIÓN 1: SOBRE MÍ -->
         <section id="inicio" class="seccion-pantalla">
             <div class="contenedor-interno-seccion">
-                <h2>Sobre mí</h2>
                 <div class="bloque-perfil">
                     <div id="contenedor-particulas-perfil"></div>
-                    <p>Estudiante de Diseño Multimedia en la Universidad Nacional de Moreno. Me enfoco en crear experiencias inmersivas y arte espacial utilizando herramientas como TouchDesigner, After Effects, Arduino y Blender.</p>
+                    <div class="perfil-texto">
+                        <h2>Sobre mí</h2>
+                        <p>Estudiante de Diseño Multimedia en la Universidad Nacional de Moreno. Me enfoco en crear experiencias inmersivas y arte espacial utilizando herramientas como TouchDesigner, After Effects, Arduino y Blender.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -118,6 +120,7 @@
                         <p>Instalación interactiva en conmemoración a los 50 años de Memoria, Verdad y Justicia.</p>
                         <a href="#modal-memoria" class="boton-proyecto">Más información</a>
                     </article>
+
                     <article class="tarjeta-proyecto">
                         <img src="img/armonia.webp"
                              alt="Visualización 3D interactiva de la instalación museográfica La armonía del saber"
@@ -141,8 +144,6 @@
                 <div class="escena-ritual">
                     <div class="pedestal-reliquia">
                         <a href="mailto:kevanel2001@gmail.com?subject=Consulta%20desde%20Portfolio" class="reliquia-arrastrable" data-accion="correo">
-                            <div class="grupo-iconos" aria-hidden="true">
-                            </div>
                             <span class="reliquia-titulo">Hablame</span>
                         </a>
                     </div>
@@ -153,8 +154,6 @@
 
                     <div class="pedestal-reliquia">
                         <a href="https://www.behance.net/kevindall" target="_blank" rel="noopener noreferrer" class="reliquia-arrastrable" data-accion="behance">
-                            <div class="grupo-iconos" aria-hidden="true">
-                            </div>
                             <span class="reliquia-titulo">Behance</span>
                         </a>
                     </div>
@@ -210,6 +209,7 @@
             </ul>
         </div>
     </div>
+
     <div id="modal-armonia" class="modal-contenedor">
         <a href="#resto-proyectos" class="modal-fondo-cerrar" aria-label="Cerrar ventana"></a>
         <div class="modal-contenido">
