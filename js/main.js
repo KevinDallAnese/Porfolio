@@ -55,17 +55,18 @@ function crearSpriteMarca() {
 
 function muestrearPuntosTexto(esMobile, objetivo) {
     const pg = createGraphics(width, height);
+    pg.pixelDensity(1);
     pg.background(0);
     pg.fill(255);
     pg.textFont('Georgia, Times New Roman, serif');
     pg.textAlign(CENTER, CENTER);
     pg.textStyle(BOLD);
-    pg.textSize(esMobile ? 28 : 64);
+    pg.textSize(esMobile ? constrain(width * 0.115, 26, 36) : 64);
     pg.text('KEVIN D.D', width / 2, height / 2);
     pg.loadPixels();
 
-    const cajaAncho = esMobile ? width * 0.92 : 550;
-    const cajaAlto = esMobile ? 100 : 180;
+    const cajaAncho = esMobile ? width * 0.94 : 550;
+    const cajaAlto = esMobile ? 120 : 180;
     const minX = max(0, floor(width / 2 - cajaAncho / 2));
     const maxX = min(width, floor(width / 2 + cajaAncho / 2));
     const minY = max(0, floor(height / 2 - cajaAlto / 2));
@@ -74,16 +75,16 @@ function muestrearPuntosTexto(esMobile, objetivo) {
     const puntos = [];
     let intentos = 0;
 
-    while (puntos.length < objetivo && intentos < 35000) {
+    while (puntos.length < objetivo && intentos < 45000) {
         intentos++;
         const rx = floor(random(minX, maxX));
         const ry = floor(random(minY, maxY));
         const idx = (rx + ry * width) * 4;
 
-        if (pg.pixels[idx] > 128) {
+        if (pg.pixels[idx] > 90) {
             puntos.push({
-                x: rx + random(-0.4, 0.4),
-                y: ry + random(-0.4, 0.4)
+                x: rx + random(-0.35, 0.35),
+                y: ry + random(-0.35, 0.35)
             });
         }
     }
@@ -203,14 +204,15 @@ function setup() {
     contenedorSnap = document.querySelector('.portada-snap');
 
     if (contenedorSnap) {
+        contenedorSnap.scrollTop = 0;
         contenedorSnap.style.overflowY = 'hidden';
     }
 
     const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
     ultimoModoMobile = esMobile;
-    const totalParticulas = esMobile ? 800 : 1600;
-    const anchoImg = esMobile ? 150 : 260;
-    const altoImg = esMobile ? 200 : 350;
+    const totalParticulas = esMobile ? 950 : 1600;
+    const anchoImg = esMobile ? 210 : 260;
+    const altoImg = esMobile ? 275 : 350;
 
     const puntosTexto = muestrearPuntosTexto(esMobile, totalParticulas);
     const puntosRitual = generarPuntosRitual(totalParticulas, esMobile);
@@ -419,7 +421,10 @@ function configurarRitualEntrada() {
         }
 
         setTimeout(() => {
-            if (contenedorSnap) contenedorSnap.style.overflowY = 'scroll';
+            if (contenedorSnap) {
+                contenedorSnap.scrollTop = 0;
+                contenedorSnap.style.overflowY = 'scroll';
+            }
         }, 650);
     };
 
@@ -577,6 +582,15 @@ function configurarProfundidadCarrusel() {
     let clonesCreados = false;
     let tarjetas = [...tarjetasOriginales];
 
+    const centrarTarjetaHorizontal = (tarjeta, suave = false) => {
+        if (!tarjeta) return;
+        const destinoX = tarjeta.offsetLeft - (galeria.clientWidth - tarjeta.offsetWidth) / 2;
+        galeria.scrollTo({
+            left: destinoX,
+            behavior: suave ? 'smooth' : 'auto'
+        });
+    };
+
     let puntos = [];
     if (contenedorIndicador) {
         contenedorIndicador.innerHTML = '';
@@ -587,11 +601,7 @@ function configurarProfundidadCarrusel() {
             btn.setAttribute('aria-label', `Ver proyecto ${indice + 1} de ${total}`);
             btn.addEventListener('click', () => {
                 const objetivo = clonesCreados ? tarjetas[indice + 1] : tarjetas[indice];
-                objetivo.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'nearest',
-                    inline: 'center'
-                });
+                centrarTarjetaHorizontal(objetivo, true);
             });
             contenedorIndicador.appendChild(btn);
             return btn;
@@ -611,11 +621,7 @@ function configurarProfundidadCarrusel() {
         tarjetas = Array.from(galeria.querySelectorAll('.tarjeta-proyecto'));
         clonesCreados = true;
 
-        galeria.style.scrollBehavior = 'auto';
-        tarjetasOriginales[0].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
-        requestAnimationFrame(() => {
-            galeria.style.scrollBehavior = 'smooth';
-        });
+        centrarTarjetaHorizontal(tarjetasOriginales[0], false);
     };
 
     const desactivarBucle360 = () => {
@@ -645,17 +651,9 @@ function configurarProfundidadCarrusel() {
 
         if (menorDist < 8) {
             if (indiceEnDom === 0) {
-                galeria.style.scrollBehavior = 'auto';
-                tarjetas[total].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
-                requestAnimationFrame(() => {
-                    galeria.style.scrollBehavior = 'smooth';
-                });
+                centrarTarjetaHorizontal(tarjetas[total], false);
             } else if (indiceEnDom === total + 1) {
-                galeria.style.scrollBehavior = 'auto';
-                tarjetas[1].scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
-                requestAnimationFrame(() => {
-                    galeria.style.scrollBehavior = 'smooth';
-                });
+                centrarTarjetaHorizontal(tarjetas[1], false);
             }
         }
     };
@@ -946,8 +944,8 @@ function windowResized() {
 
     if (ultimoModoMobile !== esMobile) {
         ultimoModoMobile = esMobile;
-        const anchoImg = esMobile ? 150 : 260;
-        const altoImg = esMobile ? 200 : 350;
+        const anchoImg = esMobile ? 210 : 260;
+        const altoImg = esMobile ? 275 : 350;
         cargarPuntosRetratos(anchoImg, altoImg);
     }
 }
@@ -981,7 +979,7 @@ class Particula {
         this.friccion = random(0.70, 0.78);
 
         this.tamanoTexto = esMobile ? random(3.2, 5.5) : random(4, 7.5);
-        this.tamanoPerfil = map(this.luz, 0, 1, 1.6, 3.4);
+        this.tamanoPerfil = map(this.luz, 0, 1, esMobile ? 2.0 : 1.6, esMobile ? 4.0 : 3.4);
         this.tamanoFlujo = esMobile ? random(3, 6) : random(2.5, 5.5);
 
         this.vida = random(0, 1);
@@ -1000,7 +998,8 @@ class Particula {
         this.imgOffsetX = imgOffsetX;
         this.imgOffsetY = imgOffsetY;
         this.luz = luz;
-        this.tamanoPerfil = map(this.luz, 0, 1, 1.6, 3.4);
+        const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
+        this.tamanoPerfil = map(this.luz, 0, 1, esMobile ? 2.0 : 1.6, esMobile ? 4.0 : 3.4);
     }
 
     renacerEnCursor(punteroX, punteroY, velMouseX, velMouseY) {
