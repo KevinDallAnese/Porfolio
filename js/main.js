@@ -152,18 +152,22 @@ function aplicarMapaRetrato(indice) {
 function cargarPuntosRetratos(anchoImg, altoImg) {
     CONFIG.FUENTES_IMAGEN.forEach((ruta, indice) => {
         loadImage(ruta, (img) => {
-            const densidad = 2;
-            img.resize(anchoImg, altoImg);
-            img.loadPixels();
+            const pg = createGraphics(anchoImg, altoImg);
+            pg.pixelDensity(1);
+            pg.clear();
+            pg.image(img, 0, 0, anchoImg, altoImg);
+            pg.loadPixels();
 
+            const densidad = 2;
             const puntos = [];
-            for (let y = 0; y < img.height; y += densidad) {
-                for (let x = 0; x < img.width; x += densidad) {
-                    const idx = (x + y * img.width) * 4;
-                    const r = img.pixels[idx];
-                    const g = img.pixels[idx + 1];
-                    const b = img.pixels[idx + 2];
-                    const a = img.pixels[idx + 3];
+
+            for (let y = 0; y < altoImg; y += densidad) {
+                for (let x = 0; x < anchoImg; x += densidad) {
+                    const idx = (x + y * anchoImg) * 4;
+                    const r = pg.pixels[idx];
+                    const g = pg.pixels[idx + 1];
+                    const b = pg.pixels[idx + 2];
+                    const a = pg.pixels[idx + 3];
 
                     if (a > 120) {
                         const brillo = r * 0.299 + g * 0.587 + b * 0.114;
@@ -177,6 +181,8 @@ function cargarPuntosRetratos(anchoImg, altoImg) {
                     }
                 }
             }
+
+            pg.remove();
 
             if (puntos.length > 0) {
                 mapasRetratos[indice] = shuffle(puntos);
@@ -756,12 +762,31 @@ function ejecutarAccionReliquia(reliquia, centroAltarX, centroAltarY) {
             }, 2500);
         }
 
+        const asunto = encodeURIComponent('Consulta desde Portfolio');
+        const urlGmailWeb = `https://mail.google.com/mail/?view=cm&fs=1&to=${correoLimpio}&su=${asunto}`;
         const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
+
         if (esMobile) {
-            window.location.href = urlDestino;
+            const enlaceTemp = document.createElement('a');
+            enlaceTemp.href = urlDestino;
+            enlaceTemp.style.display = 'none';
+            document.body.appendChild(enlaceTemp);
+            enlaceTemp.click();
+            enlaceTemp.remove();
+
+            let appAbierta = false;
+            const marcarSalida = () => { appAbierta = true; };
+            window.addEventListener('blur', marcarSalida, { once: true });
+            document.addEventListener('visibilitychange', marcarSalida, { once: true });
+
+            setTimeout(() => {
+                window.removeEventListener('blur', marcarSalida);
+                document.removeEventListener('visibilitychange', marcarSalida);
+                if (!appAbierta) {
+                    window.open(urlGmailWeb, '_blank', 'noopener,noreferrer');
+                }
+            }, 600);
         } else {
-            const asunto = encodeURIComponent('Consulta desde Portfolio');
-            const urlGmailWeb = `https://mail.google.com/mail/?view=cm&fs=1&to=${correoLimpio}&su=${asunto}`;
             window.open(urlGmailWeb, '_blank', 'noopener,noreferrer');
         }
     } else {
