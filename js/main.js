@@ -41,7 +41,7 @@ let ultimoModoMobile = null;
 
 function crearSpriteMarca() {
     const { r, g, b } = CONFIG.COLOR_MARCA;
-    const pg = createGraphics(48, 48);
+    const pg = createGraphics(64, 64);
     pg.pixelDensity(1);
     const ctx = pg.drawingContext;
     const grad = ctx.createRadialGradient(24, 24, 0, 24, 24, 24);
@@ -86,8 +86,8 @@ function muestrearPuntosTexto(esMobile, objetivo) {
 
         if (pg.pixels[idx] > 90) {
             puntos.push({
-                x: rx + random(-0.35, 0.35),
-                y: ry + random(-0.35, 0.35)
+                x: rx + random(-0.15, 0.15),
+                y: ry + random(-0.15, 0.15)
             });
         }
     }
@@ -199,7 +199,7 @@ function cargarPuntosRetratos(anchoImg, altoImg) {
 
 function setup() {
     const esMobile = window.innerWidth <= CONFIG.BREAKPOINT_MOBILE;
-    pixelDensity(esMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2));
+    pixelDensity(esMobile ? 1.5 : Math.min(window.devicePixelRatio || 1, 2));
 
     canvasGlobal = createCanvas(windowWidth, windowHeight);
     canvasGlobal.id('canvas-global-particulas');
@@ -590,13 +590,19 @@ function configurarCambioRetrato() {
         activarRetrato(siguiente, true);
     });
 
-    // Móvil: carrusel lateral por deslizamiento y rombos indicadores
+    // Móvil: carrusel lateral por deslizamiento limpio
     if (carruselMovil) {
+        let timeoutScroll;
         carruselMovil.addEventListener('scroll', () => {
             if (window.innerWidth > CONFIG.BREAKPOINT_MOBILE) return;
-            const anchoSlide = carruselMovil.clientWidth || 1;
-            const indiceSlide = Math.round(carruselMovil.scrollLeft / anchoSlide);
-            activarRetrato(constrain(indiceSlide, 0, mapasRetratos.length - 1), true);
+
+            clearTimeout(timeoutScroll);
+            timeoutScroll = setTimeout(() => {
+                const anchoSlide = carruselMovil.clientWidth || 1;
+                const indiceSlide = Math.round(carruselMovil.scrollLeft / anchoSlide);
+                const indiceRestringido = constrain(indiceSlide, 0, mapasRetratos.length - 1);
+                activarRetrato(indiceRestringido, true);
+            }, 50);
         }, { passive: true });
 
         puntosRetrato.forEach((btn) => {
@@ -616,124 +622,66 @@ function configurarProfundidadCarrusel() {
     const contenedorIndicador = document.querySelector('.indicador-carrusel');
     if (!galeria) return;
 
-    const tarjetasOriginales = Array.from(galeria.querySelectorAll('.tarjeta-proyecto'));
-    if (!tarjetasOriginales.length) return;
+    const tarjetas = Array.from(galeria.querySelectorAll('.tarjeta-proyecto'));
+    if (!tarjetas.length) return;
 
-    const total = tarjetasOriginales.length;
-
-    // Limpiar clones previos si existieran
-    galeria.querySelectorAll('.tarjeta-proyecto[data-clon]').forEach(c => c.remove());
-
-    const clonPrimero = tarjetasOriginales[0].cloneNode(true);
-    const clonUltimo = tarjetasOriginales[total - 1].cloneNode(true);
-    
-    clonPrimero.setAttribute('data-clon', 'true');
-    clonUltimo.setAttribute('data-clon', 'true');
-    clonPrimero.setAttribute('aria-hidden', 'true');
-    clonUltimo.setAttribute('aria-hidden', 'true');
-
-    galeria.insertBefore(clonUltimo, tarjetasOriginales[0]);
-    galeria.appendChild(clonPrimero);
-
-    const todasLasTarjetas = Array.from(galeria.querySelectorAll('.tarjeta-proyecto'));
-
-    const centrarEnTarjeta = (tarjeta, suave = true) => {
-        if (!tarjeta) return;
-        const destinoX = tarjeta.offsetLeft - (galeria.clientWidth - tarjeta.offsetWidth) / 2;
-        galeria.scrollTo({
-            left: destinoX,
-            behavior: suave ? 'smooth' : 'auto'
-        });
-    };
-
-    const centrarInicial = () => {
-        galeria.style.scrollBehavior = 'auto';
-        centrarEnTarjeta(todasLasTarjetas[1], false);
-        galeria.offsetHeight;
-        galeria.style.scrollBehavior = 'smooth';
-    };
-
-    centrarInicial();
+    const total = tarjetas.length;
+    let indiceActual = 0;
 
     let puntos = [];
+    const mostrarTarjeta = (indice) => {
+        indiceActual = (indice + total) % total;
+        tarjetas.forEach((tarjeta, i) => {
+            tarjeta.classList.toggle('activo', i === indiceActual);
+        });
+        if (puntos.length) {
+            puntos.forEach((punto, i) => {
+                punto.classList.toggle('activo', i === indiceActual);
+            });
+        }
+    };
+
     if (contenedorIndicador) {
         contenedorIndicador.innerHTML = '';
-        puntos = tarjetasOriginales.map((_, indice) => {
+        puntos = tarjetas.map((_, indice) => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'punto-carrusel';
             btn.setAttribute('aria-label', `Ver proyecto ${indice + 1} de ${total}`);
+            if (indice === 0) btn.classList.add('activo');
             btn.addEventListener('click', () => {
-                centrarEnTarjeta(todasLasTarjetas[indice + 1], true);
+                mostrarTarjeta(indice);
             });
             contenedorIndicador.appendChild(btn);
             return btn;
         });
     }
 
-    const actualizarFocoTarjetas = () => {
-        if (window.innerWidth > CONFIG.BREAKPOINT_MOBILE) {
-            todasLasTarjetas.forEach((tarjeta) => {
-                tarjeta.style.transform = '';
-                tarjeta.style.filter = '';
-                tarjeta.style.opacity = '';
-                tarjeta.style.pointerEvents = '';
-            });
-            return;
-        }
+    // Soporte para deslizar (swipe) en móvil sin scroll libre
+    let touchInicioX = 0;
+    let touchInicioY = 0;
 
-        const rectGaleria = galeria.getBoundingClientRect();
-        const centroGaleria = rectGaleria.left + rectGaleria.width / 2;
-        let indiceActivoDom = 1;
-        let menorDistancia = Infinity;
+    galeria.addEventListener('touchstart', (e) => {
+        if (window.innerWidth > CONFIG.BREAKPOINT_MOBILE) return;
+        touchInicioX = e.touches[0].clientX;
+        touchInicioY = e.touches[0].clientY;
+    }, { passive: true });
 
-        todasLasTarjetas.forEach((tarjeta, indice) => {
-            const rectTarjeta = tarjeta.getBoundingClientRect();
-            const centroTarjeta = rectTarjeta.left + rectTarjeta.width / 2;
-            const distanciaPx = Math.abs(centroGaleria - centroTarjeta);
+    galeria.addEventListener('touchend', (e) => {
+        if (window.innerWidth > CONFIG.BREAKPOINT_MOBILE) return;
+        const deltaX = e.changedTouches[0].clientX - touchInicioX;
+        const deltaY = e.changedTouches[0].clientY - touchInicioY;
 
-            if (distanciaPx < menorDistancia) {
-                menorDistancia = distanciaPx;
-                indiceActivoDom = indice;
+        if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+            if (deltaX < 0) {
+                mostrarTarjeta(indiceActual + 1);
+            } else {
+                mostrarTarjeta(indiceActual - 1);
             }
-
-            const distanciaNorm = Math.min(1, distanciaPx / (rectGaleria.width * 0.75));
-            const escala = 1 - distanciaNorm * 0.08;
-            const brillo = 1 - distanciaNorm * 0.78;
-            const desenfoque = distanciaNorm * 3.5;
-            const opacidad = 1 - distanciaNorm * 0.55;
-
-            tarjeta.style.transform = `scale(${escala.toFixed(3)})`;
-            tarjeta.style.filter = `brightness(${brillo.toFixed(2)}) blur(${desenfoque.toFixed(1)}px)`;
-            tarjeta.style.opacity = opacidad.toFixed(2);
-            tarjeta.style.pointerEvents = distanciaNorm > 0.45 ? 'none' : 'auto';
-        });
-
-        const indiceReal = (indiceActivoDom - 1 + total) % total;
-        puntos.forEach((punto, indice) => {
-            punto.classList.toggle('activo', indice === indiceReal);
-        });
-
-        // Verificación de salto instantáneo limpio sin parpadeo
-        const tarjetaInicioReal = todasLasTarjetas[1];
-        const tarjetaFinReal = todasLasTarjetas[total];
-
-        if (indiceActivoDom === 0) {
-            galeria.style.scrollBehavior = 'auto';
-            centrarEnTarjeta(tarjetaFinReal, false);
-            galeria.offsetHeight; // Forzar reflow síncrono para evitar el parpadeo
-            galeria.style.scrollBehavior = 'smooth';
-        } else if (indiceActivoDom === total + 1) {
-            galeria.style.scrollBehavior = 'auto';
-            centrarEnTarjeta(tarjetaInicioReal, false);
-            galeria.offsetHeight; // Forzar reflow síncrono para evitar el parpadeo
-            galeria.style.scrollBehavior = 'smooth';
         }
-    };
+    }, { passive: true });
 
-    galeria.addEventListener('scroll', actualizarFocoTarjetas, { passive: true });
-    window.addEventListener('resize', centrarInicial);
-    actualizarFocoTarjetas();
+    mostrarTarjeta(0);
 }
 
 function calcularDistanciaAltar(reliquia) {
@@ -908,7 +856,6 @@ function draw() {
     const tiempo = frameCount * 0.014;
     const ctx = drawingContext;
 
-    // En móvil solo hay puntero activo mientras se toca la pantalla
     const hayToqueActivo = touches.length > 0;
     const punteroActivo = esMobile ? hayToqueActivo : (mouseX > 0 || mouseY > 0);
     const punteroX = hayToqueActivo ? touches[0].x : (esMobile ? -9999 : mouseX);
@@ -932,7 +879,6 @@ function draw() {
         }
     }
 
-    // En móvil, en las secciones de proyectos liberamos la GPU dejando el canvas vacío
     if (esMobile && estado === 'FLUJO') {
         return;
     }
