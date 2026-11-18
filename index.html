@@ -50,7 +50,18 @@
         <section id="inicio" class="seccion-pantalla">
             <div class="contenedor-interno-seccion">
                 <div class="bloque-perfil">
-                    <div id="contenedor-particulas-perfil"></div>
+                    <div class="perfil-visual-contenedor">
+                        <div id="contenedor-particulas-perfil">
+                            <div id="carrusel-retrato-movil" class="carrusel-retrato-movil" aria-label="Alternar retrato">
+                                <div class="slide-retrato"></div>
+                                <div class="slide-retrato"></div>
+                            </div>
+                        </div>
+                        <div class="indicador-retrato" aria-label="Selector de retrato">
+                            <button type="button" class="punto-carrusel punto-retrato activo" data-indice="0" aria-label="Retrato 1"></button>
+                            <button type="button" class="punto-carrusel punto-retrato" data-indice="1" aria-label="Retrato 2"></button>
+                        </div>
+                    </div>
                     <div class="perfil-texto">
                         <h2>Sobre mí</h2>
                         <p>Estudiante de Diseño Multimedia en la Universidad Nacional de Moreno. Me enfoco en crear experiencias inmersivas y arte espacial utilizando herramientas como TouchDesigner, After Effects, Arduino y Blender.</p>
