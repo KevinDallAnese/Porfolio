@@ -20,21 +20,25 @@
     --texto-l:   1.563rem;
     --texto-xl:  1.953rem;
 
-    --espacio-1: 0.25rem;
-    --espacio-2: 0.5rem;
-    --espacio-3: 1rem;
-    --espacio-4: 1.5rem;
-    --espacio-5: 2rem;
+    /* Retícula de 8 puntos (base 16px) */
+    --espacio-1: 0.5rem;   /*  8px */
+    --espacio-2: 1rem;     /* 16px */
+    --espacio-3: 1.5rem;   /* 24px */
+    --espacio-4: 2rem;     /* 32px */
+    --espacio-5: 3rem;     /* 48px */
+    --espacio-6: 4rem;     /* 64px */
+    --espacio-7: 5rem;     /* 80px */
+    --espacio-8: 5.5rem;   /* 88px */
 
     --corte-arcano: polygon(
-        14px 0,
-        calc(100% - 14px) 0,
-        100% 14px,
-        100% calc(100% - 14px),
-        calc(100% - 14px) 100%,
-        14px 100%,
-        0 calc(100% - 14px),
-        0 14px
+        16px 0,
+        calc(100% - 16px) 0,
+        100% 16px,
+        100% calc(100% - 16px),
+        calc(100% - 16px) 100%,
+        16px 100%,
+        0 calc(100% - 16px),
+        0 16px
     );
     --corte-boton: polygon(
         8px 0,
@@ -111,8 +115,8 @@ h2 {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     margin-bottom: var(--espacio-2);
-    padding-bottom: var(--espacio-2);
-    text-shadow: 0 2px 18px var(--color-sombra), 0 0 24px var(--color-marca-glow);
+    padding-bottom: var(--espacio-1);
+    text-shadow: 0 2px 16px var(--color-sombra), 0 0 24px var(--color-marca-glow);
 }
 
 h2::after {
@@ -149,7 +153,7 @@ a {
 a:hover,
 a:focus {
     color: var(--color-texto);
-    text-shadow: 0 0 10px var(--color-marca);
+    text-shadow: 0 0 8px var(--color-marca);
 }
 
 /* ==========================================================================
@@ -168,7 +172,7 @@ a:focus {
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    padding-bottom: var(--espacio-5);
+    padding-bottom: var(--espacio-4);
 }
 
 .loader-velo.oculto {
@@ -183,7 +187,7 @@ a:focus {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding-inline: var(--espacio-3);
+    padding-inline: var(--espacio-2);
     pointer-events: none;
 }
 
@@ -199,7 +203,7 @@ a:focus {
 
 @keyframes pulsoSutil {
     0%, 100% { opacity: 0.35; text-shadow: none; }
-    50%      { opacity: 0.95; text-shadow: 0 0 12px var(--color-marca-tenue); }
+    50%      { opacity: 0.95; text-shadow: 0 0 16px var(--color-marca-tenue); }
 }
 
 #canvas-global-particulas {
@@ -220,9 +224,9 @@ a:focus {
     left: 0;
     width: 100%;
     background: linear-gradient(180deg, var(--color-fondo) 0%, var(--color-sombra) 100%);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(8px);
     z-index: 990;
-    padding: var(--espacio-3) var(--espacio-4);
+    padding: var(--espacio-2) var(--espacio-3);
 }
 
 .cabecera-fija::after {
@@ -236,7 +240,7 @@ a:focus {
 }
 
 .cabecera-interior {
-    max-width: 1100px;
+    max-width: 1104px;
     margin-inline: auto;
     display: flex;
     justify-content: space-between;
@@ -252,7 +256,7 @@ a:focus {
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--color-texto);
-    text-shadow: 0 0 14px var(--color-marca-glow);
+    text-shadow: 0 0 16px var(--color-marca-glow);
 }
 
 .menu-toggle-input {
@@ -263,8 +267,8 @@ a:focus {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 28px;
-    height: 20px;
+    width: 24px;
+    height: 16px;
     cursor: pointer;
     z-index: 1001;
 }
@@ -274,13 +278,13 @@ a:focus {
     width: 100%;
     height: 1px;
     background-color: var(--color-marca);
-    box-shadow: 0 0 6px var(--color-marca);
+    box-shadow: 0 0 8px var(--color-marca);
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .menu-navegacion {
     position: fixed;
-    top: 60px;
+    top: var(--espacio-6);
     left: 0;
     width: 100%;
     background-color: var(--color-fondo);
@@ -289,7 +293,7 @@ a:focus {
     opacity: 0;
     pointer-events: none;
     transition: transform 0.3s ease, opacity 0.3s ease;
-    box-shadow: 0 20px 40px var(--color-sombra);
+    box-shadow: 0 24px 40px var(--color-sombra);
     z-index: 980;
 }
 
@@ -298,7 +302,7 @@ a:focus {
     flex-direction: column;
     gap: 0;
     list-style: none;
-    padding: var(--espacio-2) var(--espacio-4);
+    padding: var(--espacio-1) var(--espacio-3);
     margin: 0;
 }
 
@@ -312,14 +316,14 @@ a:focus {
     text-transform: uppercase;
     letter-spacing: 0.14em;
     border-bottom: 1px solid var(--color-borde);
-    padding: var(--espacio-3) var(--espacio-2);
+    padding: var(--espacio-2) var(--espacio-1);
     transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 .menu-navegacion a:hover,
 .menu-navegacion a:focus {
     color: var(--color-texto);
-    text-shadow: 0 0 12px var(--color-marca);
+    text-shadow: 0 0 16px var(--color-marca);
     outline: none;
 }
 
@@ -330,7 +334,7 @@ a:focus {
 }
 
 .menu-toggle-input:checked ~ .menu-hamburguesa-btn .linea-hamburguesa:nth-child(1) {
-    transform: translateY(9px) rotate(45deg);
+    transform: translateY(8px) rotate(45deg);
 }
 
 .menu-toggle-input:checked ~ .menu-hamburguesa-btn .linea-hamburguesa:nth-child(2) {
@@ -338,7 +342,7 @@ a:focus {
 }
 
 .menu-toggle-input:checked ~ .menu-hamburguesa-btn .linea-hamburguesa:nth-child(3) {
-    transform: translateY(-9px) rotate(-45deg);
+    transform: translateY(-8px) rotate(-45deg);
 }
 
 /* ==========================================================================
@@ -369,8 +373,8 @@ a:focus {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding: 4.8rem var(--espacio-3) var(--espacio-2);
-    max-width: 1100px;
+    padding: var(--espacio-7) var(--espacio-2) var(--espacio-2);
+    max-width: 1104px;
     margin-inline: auto;
 }
 
@@ -401,19 +405,22 @@ a:focus {
     align-items: center;
     text-align: center;
     width: 100%;
+    min-height: 0;
 }
 
 .perfil-visual-contenedor {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 0 auto var(--espacio-3) auto;
+    margin: 0 auto var(--espacio-2) auto;
+    flex-shrink: 1;
+    min-height: 0;
 }
 
 #contenedor-particulas-perfil {
     position: relative;
-    width: 210px;
-    height: 275px;
+    width: min(208px, 42vw);
+    height: min(272px, 32dvh);
     cursor: pointer;
 }
 
@@ -446,8 +453,8 @@ a:focus {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--espacio-3);
-    margin-top: var(--espacio-2);
+    gap: var(--espacio-2);
+    margin-top: var(--espacio-1);
 }
 
 .perfil-texto {
@@ -462,8 +469,8 @@ a:focus {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     margin-bottom: var(--espacio-2);
-    padding-bottom: var(--espacio-2);
-    text-shadow: 0 2px 18px var(--color-sombra), 0 0 24px var(--color-marca-glow);
+    padding-bottom: var(--espacio-1);
+    text-shadow: 0 2px 16px var(--color-sombra), 0 0 24px var(--color-marca-glow);
 }
 
 .perfil-texto h2::after {
@@ -482,6 +489,46 @@ a:focus {
     margin-inline: 0;
 }
 
+.herramientas-perfil {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: var(--espacio-1);
+    list-style: none;
+    padding: 0;
+    margin: var(--espacio-2) 0 0 0;
+}
+
+.item-herramienta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--espacio-1);
+    padding: var(--espacio-1) var(--espacio-2);
+    background: linear-gradient(160deg, var(--color-superficie) 0%, var(--color-fondo) 100%);
+    border: 1px solid var(--color-borde);
+    clip-path: var(--corte-boton);
+    color: var(--color-texto-tenue);
+    font-family: var(--fuente-titulos);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.item-herramienta svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-marca);
+    flex-shrink: 0;
+}
+
+.item-herramienta:hover {
+    border-color: var(--color-marca);
+    color: var(--color-texto);
+    box-shadow: 0 0 16px var(--color-marca-glow);
+    transform: translateY(-2px);
+}
+
 /* ==========================================================================
    7. SECCIONES 2 Y 3: PROYECTOS (MOBILE FIRST)
    ========================================================================== */
@@ -495,9 +542,9 @@ a:focus {
 }
 
 .tarjeta-proyecto-hero {
-    padding: var(--espacio-3);
+    padding: var(--espacio-2);
     margin-block: auto;
-    box-shadow: inset 0 0 35px var(--color-sombra);
+    box-shadow: inset 0 0 32px var(--color-sombra);
 }
 
 .hero-grid {
@@ -518,7 +565,7 @@ a:focus {
     content: "";
     position: absolute;
     inset: 0;
-    box-shadow: inset 0 0 28px var(--color-sombra);
+    box-shadow: inset 0 0 32px var(--color-sombra);
     pointer-events: none;
 }
 
@@ -538,7 +585,7 @@ a:focus {
 
 .etiqueta-destacada {
     display: inline-block;
-    margin-bottom: var(--espacio-2);
+    margin-bottom: var(--espacio-1);
     background-color: var(--color-sombra);
     border: 1px solid var(--color-marca);
     color: var(--color-marca);
@@ -547,9 +594,9 @@ a:focus {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    padding: var(--espacio-1) var(--espacio-3);
+    padding: var(--espacio-1) var(--espacio-2);
     clip-path: var(--corte-boton);
-    box-shadow: 0 0 15px var(--color-marca-glow);
+    box-shadow: 0 0 16px var(--color-marca-glow);
     z-index: 2;
 }
 
@@ -559,7 +606,7 @@ a:focus {
     color: var(--color-marca);
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    margin-bottom: var(--espacio-2);
+    margin-bottom: var(--espacio-1);
 }
 
 .hero-tags {
@@ -568,17 +615,17 @@ a:focus {
     gap: var(--espacio-1);
     list-style: none;
     padding: 0;
-    margin: 0 0 var(--espacio-3) 0;
+    margin: 0 0 var(--espacio-2) 0;
 }
 
 .hero-tags li {
     font-family: var(--fuente-titulos);
-    font-size: 0.62rem;
+    font-size: 0.65rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--color-texto-tenue);
     border: 1px solid var(--color-borde);
-    padding: 0.2rem 0.6rem;
+    padding: var(--espacio-1) var(--espacio-2);
     background-color: var(--color-superficie);
 }
 
@@ -598,7 +645,7 @@ a:focus {
     display: none;
     flex-direction: column;
     justify-content: flex-start;
-    padding: var(--espacio-3);
+    padding: var(--espacio-2);
     border: 1px solid var(--color-borde);
     animation: aparecerTarjeta 0.35s ease;
 }
@@ -610,7 +657,7 @@ a:focus {
 @keyframes aparecerTarjeta {
     from {
         opacity: 0;
-        transform: translateY(6px);
+        transform: translateY(8px);
     }
     to {
         opacity: 1;
@@ -634,7 +681,7 @@ a:focus {
 
 .tarjeta-proyecto p {
     line-height: 1.55;
-    margin-bottom: var(--espacio-3);
+    margin-bottom: var(--espacio-2);
 }
 
 .boton-proyecto {
@@ -648,7 +695,7 @@ a:focus {
     color: var(--color-texto);
     background: linear-gradient(90deg, var(--color-marca-glow) 0%, transparent 100%);
     border: 1px solid var(--color-marca);
-    padding: 0.45rem var(--espacio-3);
+    padding: var(--espacio-1) var(--espacio-2);
     margin-top: auto;
     clip-path: var(--corte-boton);
     box-shadow: 0 0 16px var(--color-marca-glow);
@@ -667,9 +714,9 @@ a:focus {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--espacio-3);
-    margin-top: var(--espacio-2);
-    margin-bottom: var(--espacio-2);
+    gap: var(--espacio-2);
+    margin-top: var(--espacio-1);
+    margin-bottom: var(--espacio-1);
 }
 
 .indicador-carrusel::before,
@@ -686,8 +733,8 @@ a:focus {
 }
 
 .punto-carrusel {
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     padding: 0;
     background-color: transparent;
     border: 1px solid var(--color-marca-tenue);
@@ -700,7 +747,7 @@ a:focus {
     background-color: var(--color-marca);
     border-color: var(--color-marca);
     transform: rotate(45deg) scale(1.25);
-    box-shadow: 0 0 10px var(--color-marca);
+    box-shadow: 0 0 8px var(--color-marca);
 }
 
 /* ==========================================================================
@@ -733,7 +780,7 @@ a:focus {
     position: relative;
     width: 100%;
     max-width: 200px;
-    height: 46px;
+    height: 48px;
     background: linear-gradient(160deg, var(--color-superficie) 0%, var(--color-fondo) 100%);
     border: 1px solid var(--color-marca-tenue);
     clip-path: var(--corte-arcano);
@@ -742,11 +789,11 @@ a:focus {
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 0 var(--espacio-3);
+    padding: 0 var(--espacio-2);
     cursor: grab;
     user-select: none;
     touch-action: none;
-    box-shadow: 0 10px 30px var(--color-sombra), inset 0 0 20px var(--color-marca-glow);
+    box-shadow: 0 8px 32px var(--color-sombra), inset 0 0 24px var(--color-marca-glow);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     animation: flotarReliquia 2.4s ease-in-out infinite;
     will-change: transform;
@@ -754,14 +801,14 @@ a:focus {
 
 @keyframes flotarReliquia {
     0%, 100% { transform: translateY(0) translateZ(0); }
-    50% { transform: translateY(-5px) translateZ(0); }
+    50% { transform: translateY(-8px) translateZ(0); }
 }
 
 .reliquia-arrastrable.arrastrando {
     animation: none;
     cursor: grabbing;
     border-color: var(--color-marca);
-    box-shadow: 0 0 35px var(--color-marca);
+    box-shadow: 0 0 32px var(--color-marca);
     z-index: 920;
 }
 
@@ -775,8 +822,8 @@ a:focus {
 }
 
 .altar-nucleo {
-    width: 108px;
-    height: 108px;
+    width: 112px;
+    height: 112px;
     border-radius: 50%;
     border: 2px dashed var(--color-marca-tenue);
     display: flex;
@@ -792,12 +839,12 @@ a:focus {
     0%, 100% {
         transform: scale(1) translateZ(0);
         border-color: var(--color-marca-tenue);
-        box-shadow: 0 0 0 0 hsla(12, 100%, 55%, 0.1);
+        box-shadow: 0 0 0 0 var(--color-marca-glow);
     }
     50% {
         transform: scale(1.08) translateZ(0);
         border-color: var(--color-marca);
-        box-shadow: 0 0 30px 10px hsla(12, 100%, 55%, 0.25);
+        box-shadow: 0 0 32px 8px var(--color-marca-tenue);
     }
 }
 
@@ -819,7 +866,7 @@ a:focus {
     border-color: var(--color-marca);
     transform: scale(1.18);
     background: radial-gradient(circle, var(--color-marca-glow) 0%, transparent 75%);
-    box-shadow: 0 0 45px var(--color-marca), inset 0 0 25px var(--color-marca-glow);
+    box-shadow: 0 0 48px var(--color-marca), inset 0 0 24px var(--color-marca-glow);
 }
 
 .altar-nucleo.activo .altar-texto {
@@ -838,7 +885,7 @@ a:focus {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: var(--espacio-3);
+    padding: var(--espacio-2);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.35s ease;
@@ -858,9 +905,9 @@ a:focus {
     width: 100%;
     max-width: 560px;
     background: linear-gradient(160deg, var(--color-superficie) 0%, var(--color-fondo) 100%);
-    padding: var(--espacio-5);
+    padding: var(--espacio-4);
     clip-path: var(--corte-arcano);
-    box-shadow: 0 20px 60px var(--color-sombra);
+    box-shadow: 0 24px 64px var(--color-sombra);
     transform: translateY(-16px) scale(0.98);
     transition: transform 0.35s ease;
 }
@@ -871,13 +918,13 @@ a:focus {
     color: var(--color-marca);
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    margin-bottom: var(--espacio-3);
+    margin-bottom: var(--espacio-2);
 }
 
 .modal-cerrar {
     position: absolute;
-    top: var(--espacio-3);
-    right: var(--espacio-4);
+    top: var(--espacio-2);
+    right: var(--espacio-3);
     font-size: 1.6rem;
     color: var(--color-texto-tenue);
     line-height: 1;
@@ -894,7 +941,7 @@ a:focus {
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--color-texto-tenue);
-    margin-top: var(--espacio-4);
+    margin-top: var(--espacio-3);
     margin-bottom: var(--espacio-2);
     border-bottom: 1px solid var(--color-borde);
     padding-bottom: var(--espacio-1);
@@ -908,7 +955,7 @@ a:focus {
 
 .lista-herramientas li {
     position: relative;
-    padding-left: var(--espacio-3);
+    padding-left: var(--espacio-2);
     font-size: var(--texto-xs);
     color: var(--color-texto);
     margin-bottom: var(--espacio-1);
@@ -920,7 +967,7 @@ a:focus {
     left: 0;
     color: var(--color-marca);
     font-size: 0.6rem;
-    top: 3px;
+    top: 4px;
 }
 
 .modal-contenedor:target {
@@ -939,8 +986,8 @@ a:focus {
 @media (min-width: 769px) {
     h2 {
         font-size: var(--texto-xl);
-        margin-bottom: var(--espacio-4);
-        padding-bottom: var(--espacio-3);
+        margin-bottom: var(--espacio-3);
+        padding-bottom: var(--espacio-2);
     }
 
     h3 {
@@ -969,20 +1016,20 @@ a:focus {
 
     .menu-navegacion ul {
         flex-direction: row;
-        gap: var(--espacio-3);
+        gap: var(--espacio-2);
         padding: 0;
     }
 
     .menu-navegacion a {
         font-size: var(--texto-xs);
         border-bottom: none;
-        padding: var(--espacio-2) var(--espacio-3);
+        padding: var(--espacio-1) var(--espacio-2);
     }
 
     .menu-navegacion a::before {
         content: "✦";
         position: absolute;
-        left: 2px;
+        left: 0;
         opacity: 0;
         color: var(--color-marca);
         font-size: 0.65rem;
@@ -998,7 +1045,7 @@ a:focus {
 
     .seccion-pantalla {
         justify-content: center;
-        padding: 5.5rem var(--espacio-3) var(--espacio-4);
+        padding: var(--espacio-8) var(--espacio-3) var(--espacio-4);
     }
 
     .contenedor-interno-seccion {
@@ -1023,8 +1070,8 @@ a:focus {
     }
 
     #contenedor-particulas-perfil {
-        width: 260px;
-        height: 350px;
+        width: 256px;
+        height: 352px;
     }
 
     .carrusel-retrato-movil,
@@ -1035,11 +1082,7 @@ a:focus {
     .perfil-texto h2 {
         font-size: 2.8rem;
         margin-bottom: var(--espacio-3);
-        padding-bottom: 0;
-    }
-
-    .perfil-texto h2::after {
-        display: none;
+        padding-bottom: var(--espacio-2);
     }
 
     .perfil-texto p {
@@ -1047,13 +1090,23 @@ a:focus {
         line-height: 1.8;
     }
 
+    .herramientas-perfil {
+        gap: var(--espacio-2);
+        margin-top: var(--espacio-3);
+    }
+
+    .item-herramienta {
+        font-size: 0.7rem;
+        padding: var(--espacio-1) var(--espacio-2);
+    }
+
     .tarjeta-proyecto-hero {
-        padding: var(--espacio-5);
+        padding: var(--espacio-4);
     }
 
     .hero-grid {
         grid-template-columns: 1.3fr 1fr;
-        gap: var(--espacio-5);
+        gap: var(--espacio-4);
     }
 
     .img-tarjeta-hero {
@@ -1062,18 +1115,19 @@ a:focus {
 
     .etiqueta-destacada {
         position: absolute;
-        top: var(--espacio-4);
-        right: var(--espacio-4);
+        top: var(--espacio-3);
+        right: var(--espacio-3);
         margin-bottom: 0;
         font-size: 0.7rem;
     }
 
     .hero-sub {
-        margin-bottom: var(--espacio-3);
+        margin-bottom: var(--espacio-2);
     }
 
     .hero-tags {
-        gap: var(--espacio-2);
+        gap: var(--espacio-1);
+        margin-bottom: var(--espacio-3);
     }
 
     .hero-tags li {
@@ -1083,14 +1137,14 @@ a:focus {
     .galeria-proyectos-compartida {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: var(--espacio-5);
+        gap: var(--espacio-4);
         overflow: visible;
         padding-inline: 0;
     }
 
     .tarjeta-proyecto {
         display: flex;
-        padding: var(--espacio-4);
+        padding: var(--espacio-3);
         border: none;
         animation: none;
     }
@@ -1100,12 +1154,12 @@ a:focus {
     }
 
     .img-tarjeta {
-        margin-bottom: var(--espacio-3);
+        margin-bottom: var(--espacio-2);
     }
 
     .boton-proyecto {
         font-size: var(--texto-xs);
-        padding: 0.6rem var(--espacio-4);
+        padding: var(--espacio-1) var(--espacio-3);
     }
 
     .indicador-carrusel {
@@ -1119,13 +1173,13 @@ a:focus {
     }
 
     .pedestal-reliquia {
-        max-width: 165px;
-        height: 180px;
+        max-width: 168px;
+        height: 184px;
     }
 
     .reliquia-arrastrable {
-        max-width: 156px;
-        height: 170px;
+        max-width: 160px;
+        height: 168px;
     }
 
     .reliquia-titulo {
@@ -1133,7 +1187,7 @@ a:focus {
     }
 
     .altar-nucleo {
-        width: 140px;
-        height: 140px;
+        width: 144px;
+        height: 144px;
     }
 }
