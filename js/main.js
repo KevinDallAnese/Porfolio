@@ -33,11 +33,25 @@ let chispasLoader = [];
 
 let mapasRetratos = [[], []];
 let indiceRetratoActual = 0;
-let ultimoModoMobile = null;
+let ultimoAnchoAncla = 0;
+let ultimoAltoAncla = 0;
 
 /* ==========================================================================
    2. INICIALIZACIÓN Y MUESTREO DE PARTÍCULAS
    ========================================================================== */
+
+function obtenerDimensionesAncla(esMobile) {
+    if (anclaPerfil && anclaPerfil.clientWidth > 0 && anclaPerfil.clientHeight > 0) {
+        return {
+            ancho: Math.round(anclaPerfil.clientWidth),
+            alto: Math.round(anclaPerfil.clientHeight)
+        };
+    }
+    return {
+        ancho: esMobile ? 208 : 256,
+        alto: esMobile ? 272 : 352
+    };
+}
 
 function crearSpriteMarca() {
     const { r, g, b } = CONFIG.COLOR_MARCA;
@@ -152,21 +166,31 @@ function aplicarMapaRetrato(indice) {
     }
 }
 
-function cargarPuntosRetratos(anchoImg, altoImg) {
+function cargarPuntosRetratos(anchoCaja, altoCaja) {
+    ultimoAnchoAncla = anchoCaja;
+    ultimoAltoAncla = altoCaja;
+
     CONFIG.FUENTES_IMAGEN.forEach((ruta, indice) => {
         loadImage(ruta, (img) => {
-            const pg = createGraphics(anchoImg, altoImg);
+            // Ajustar manteniendo proporción centrada dentro de la caja real
+            const escala = min(anchoCaja / img.width, altoCaja / img.height);
+            const drawW = Math.round(img.width * escala);
+            const drawH = Math.round(img.height * escala);
+            const offsetX = Math.round((anchoCaja - drawW) / 2);
+            const offsetY = Math.round((altoCaja - drawH) / 2);
+
+            const pg = createGraphics(anchoCaja, altoCaja);
             pg.pixelDensity(1);
             pg.clear();
-            pg.image(img, 0, 0, anchoImg, altoImg);
+            pg.image(img, offsetX, offsetY, drawW, drawH);
             pg.loadPixels();
 
             const densidad = 2;
             const puntos = [];
 
-            for (let y = 0; y < altoImg; y += densidad) {
-                for (let x = 0; x < anchoImg; x += densidad) {
-                    const idx = (x + y * anchoImg) * 4;
+            for (let y = 0; y < altoCaja; y += densidad) {
+                for (let x = 0; x < anchoCaja; x += densidad) {
+                    const idx = (x + y * anchoCaja) * 4;
                     const r = pg.pixels[idx];
                     const g = pg.pixels[idx + 1];
                     const b = pg.pixels[idx + 2];
@@ -217,10 +241,8 @@ function setup() {
         contenedorSnap.style.overflowY = 'hidden';
     }
 
-    ultimoModoMobile = esMobile;
     const totalParticulas = esMobile ? 750 : 1550;
-    const anchoImg = esMobile ? 210 : 260;
-    const altoImg = esMobile ? 275 : 350;
+    const { ancho: anchoImg, alto: altoImg } = obtenerDimensionesAncla(esMobile);
 
     const puntosTexto = muestrearPuntosTexto(esMobile, totalParticulas);
     const puntosRitual = generarPuntosRitual(totalParticulas, esMobile);
@@ -558,7 +580,6 @@ function configurarCambioRetrato() {
     const totalRetratos = mapasRetratos.length;
 
     const activarRetrato = (nuevoIndice, conImpulso = true) => {
-        // Lógica de bucle infinito circular (si pasa del último, vuelve al 0, y viceversa)
         indiceRetratoActual = (nuevoIndice + totalRetratos) % totalRetratos;
         if (!mapasRetratos[indiceRetratoActual] || !mapasRetratos[indiceRetratoActual].length) return;
 
@@ -584,13 +605,11 @@ function configurarCambioRetrato() {
         }
     };
 
-    // Escritorio: clic alterna retrato en loop infinito
     anclaPerfil.addEventListener('click', () => {
         if (estado !== 'PERFIL' || window.innerWidth <= CONFIG.BREAKPOINT_MOBILE) return;
         activarRetrato(indiceRetratoActual + 1, true);
     });
 
-    // Móvil: control por puntos indicadores
     if (puntosRetrato.length) {
         puntosRetrato.forEach((btn, idx) => {
             btn.addEventListener('click', () => {
@@ -605,7 +624,6 @@ function configurarCambioRetrato() {
         });
     }
 
-    // Móvil: deslizamiento táctil con soporte circular infinito
     if (carruselMovil) {
         let touchInicioX = 0;
         let touchInicioY = 0;
@@ -623,10 +641,8 @@ function configurarCambioRetrato() {
 
             if (Math.abs(deltaX) > 30 && Math.abs(deltaX) > Math.abs(deltaY)) {
                 if (deltaX < 0) {
-                    // Deslizó hacia la izquierda (avanza al siguiente, loop infinito)
                     activarRetrato(indiceRetratoActual + 1, true);
                 } else {
-                    // Deslizó hacia la derecha (retrocede al anterior, loop infinito)
                     activarRetrato(indiceRetratoActual - 1, true);
                 }
             }
@@ -674,7 +690,6 @@ function configurarProfundidadCarrusel() {
         });
     }
 
-    // Soporte para deslizar (swipe) en móvil sin scroll libre
     let touchInicioX = 0;
     let touchInicioY = 0;
 
@@ -802,7 +817,6 @@ function configurarReliquiasRitual() {
 
         const actualizarFisicaArrastre = () => {
             if (!arrastrando) return;
-            // Interpolación lineal suave (lerp) para eliminar tirones
             currentX += (targetX - currentX) * 0.28;
             currentY += (targetY - currentY) * 0.28;
 
@@ -863,7 +877,6 @@ function configurarReliquiasRitual() {
 
             const { distancia, centroAltarX, centroAltarY } = calcularDistanciaAltar(reliquia);
 
-            // Si hizo tap/clic rápido sin arrastrar mucho, vuela directo al altar
             if (!seMovio) {
                 const rAltar = altarInvocacion.getBoundingClientRect();
                 const rReliquia = reliquia.getBoundingClientRect();
@@ -885,7 +898,6 @@ function configurarReliquiasRitual() {
             }
 
             if (distancia < CONFIG.RADIO_ALTAR) {
-                // Efecto imán de succión al soltar cerca del altar
                 const rAltar = altarInvocacion.getBoundingClientRect();
                 const rRel = reliquia.getBoundingClientRect();
                 const succionX = currentX + ((rAltar.left + rAltar.width / 2) - (rRel.left + rRel.width / 2));
@@ -901,7 +913,6 @@ function configurarReliquiasRitual() {
                     reliquia.style.transform = '';
                 }, 250);
             } else {
-                // Retorno elástico al lugar si lo soltó lejos
                 altarInvocacion.classList.remove('activo');
                 intensidadRitual = 0;
                 reliquia.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
@@ -1012,10 +1023,8 @@ function windowResized() {
         particulas[i].recalcularEspora();
     }
 
-    if (ultimoModoMobile !== esMobile) {
-        ultimoModoMobile = esMobile;
-        const anchoImg = esMobile ? 210 : 260;
-        const altoImg = esMobile ? 275 : 350;
+    const { ancho: anchoImg, alto: altoImg } = obtenerDimensionesAncla(esMobile);
+    if (ultimoAnchoAncla !== anchoImg || ultimoAltoAncla !== altoImg) {
         cargarPuntosRetratos(anchoImg, altoImg);
     }
 }
